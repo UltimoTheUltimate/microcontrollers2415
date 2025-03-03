@@ -49,7 +49,9 @@ Node* buildMorseTree() {
     
     // Characters are added to the tree in the order they would appear in a breadth-first traversal
     // Characters with a comment next to them are custom characters to depict a particular meaning or characters with a double meaning such as 'x' being a letter and multiplication symbol, or 8 dots being "error"
-    
+    // Based on Morse Code document linked in assignment handbook
+    // Document link: https://www.itu.int/rec/R-REC-M.1677-1-200910-I/
+
     // Letters
 
     // 1 symbol characters
