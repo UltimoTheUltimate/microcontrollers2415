@@ -1,12 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
-// Structure for a Morse Tree node
-typedef struct Node {
-    char letter;  // Character stored (only in leaf nodes)
-    struct Node *dot;  // Left child (dot '.')
-    struct Node *dash; // Right child (dash '-')
-} Node;
+#include "morsetree.h"
 
 // Function to create a new node
 Node* createNode() {
@@ -54,27 +48,27 @@ Node* buildMorseTree() {
 
     // Letters
 
-    // 1 symbol characters
+    // 1 symbol characters, 2 characters
     insertMorse(root, ".", 'e');
     insertMorse(root, "-", 't');
 
-    // 2 symbol characters
+    // 2 symbol characters, 4 characters
     insertMorse(root, ". .", 'i');
     insertMorse(root, ". -", 'a');
     insertMorse(root, "- .", 'n');
     insertMorse(root, "- -", 'm');
 
-    // 3 symbol characters
+    // 3 symbol characters, 8 characters
     insertMorse(root, ". . .", 's');
     insertMorse(root, ". . -", 'u');
     insertMorse(root, ". - .", 'r');
     insertMorse(root, ". - -", 'w');
     insertMorse(root, "- . .", 'd');
-    insertMorse(root, "- . -", 'k'); // is also invitation to transmit
+    insertMorse(root, "- . -", 'k');  // is also invitation to transmit
     insertMorse(root, "- - .", 'g');
     insertMorse(root, "- - -", 'o');
 
-    // 4 symbol characters
+    // 4 symbol characters, 12 characters
     insertMorse(root, ". . . .", 'h');
     insertMorse(root, ". . . -", 'v');
     insertMorse(root, ". . - .", 'f');
@@ -82,7 +76,7 @@ Node* buildMorseTree() {
     insertMorse(root, ". - - .", 'p');
     insertMorse(root, ". - - -", 'j');
     insertMorse(root, "- . . .", 'b');
-    insertMorse(root, "- . . -", 'x'); // is also multiplication sign
+    insertMorse(root, "- . . -", 'x');  // is also multiplication sign
     insertMorse(root, "- . - .", 'c');
     insertMorse(root, "- . - -", 'y');
     insertMorse(root, "- - . .", 'z');
@@ -90,27 +84,27 @@ Node* buildMorseTree() {
 
     // Numbers and special characters
 
-    // 5 symbol characters
+    // 5 symbol characters, 17 characters
     insertMorse(root, ". . . . .", '5');
     insertMorse(root, ". . . . -", '4');
-    insertMorse(root, ". . . - .", '~'); // understood
+    insertMorse(root, ". . . - .", '~');  // understood
     insertMorse(root, ". . . - -", '3');
     insertMorse(root, ". . - - -", '2');
-    insertMorse(root, ". - . . .", '&'); // wait
+    insertMorse(root, ". - . . .", '&');  // wait
     insertMorse(root, ". - . - .", '+');
     insertMorse(root, ". - - - -", '1');
     insertMorse(root, "- . . . .", '6');
     insertMorse(root, "- . . . -", '=');
     insertMorse(root, "- . . - .", '/');
-    insertMorse(root, "- . - . -", '#'); // starting signal
+    insertMorse(root, "- . - . -", '#');  // starting signal
     insertMorse(root, "- . - - .", '(');
     insertMorse(root, "- - . . .", '7');
     insertMorse(root, "- - - . .", '8');
     insertMorse(root, "- - - - .", '9');
     insertMorse(root, "- - - - -", '0');
 
-    // 6 symbol characters
-    insertMorse(root, ". . . - . -", '|'); // end of work
+    // 6 symbol characters, 10 characters
+    insertMorse(root, ". . . - . -", '|');  // end of work
     insertMorse(root, ". . - - . .", '?');
     insertMorse(root, ". - . . - .", '"');
     insertMorse(root, ". - . - . -", '.');
@@ -121,8 +115,8 @@ Node* buildMorseTree() {
     insertMorse(root, "- - . . - -", ',');
     insertMorse(root, "- - - . . .", ':');
 
-    // 8 symbol characters
-    insertMorse(root, ". . . . . . . .", '^'); // error (8 dots)
+    // 8 symbol characters, 1 character
+    insertMorse(root, ". . . . . . . .", '^');  // error (8 dots)
 
     return root;
 }
@@ -151,24 +145,4 @@ void freeMorseTree(Node* root) {
     freeMorseTree(root->dot);
     freeMorseTree(root->dash);
     free(root);
-}
-
-// Simple test
-int main() {
-    Node* morseTree = buildMorseTree();
-
-    // Test decoding                                                                 should return:
-    printf("Morse '.' -> %c\n", decodeMorse(morseTree, "."));                        // e
-    printf("Morse '-' -> %c\n", decodeMorse(morseTree, "-"));                        // t
-    printf("Morse '. -' -> %c\n", decodeMorse(morseTree, ". -"));                    // a
-    printf("Morse '- . . .' -> %c\n", decodeMorse(morseTree, "- . . ."));            // b
-    printf("Morse '- . - .' -> %c\n", decodeMorse(morseTree, "- . - ."));            // c
-    printf("Morse '. - - - -' -> %c\n", decodeMorse(morseTree, ". - - - -"));        // 1
-    printf("Morse '. . - - -' -> %c\n", decodeMorse(morseTree, ". . - - -"));        // 2
-    printf("Morse '. . . - -' -> %c\n", decodeMorse(morseTree, ". . . - -"));        // 3
-
-    // Free allocated memory
-    freeMorseTree(morseTree);
-
-    return 0;
 }
