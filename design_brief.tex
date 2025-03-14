@@ -51,7 +51,7 @@ As all functions depend on data provided by previous functions, out of order exe
 \section{Management}
 Based on Fig. 1, digital to char has a robust implementation regarding the Morse code binary tree, but an implementation to hide spaces is not yet finalized. Although the rest of the code still needs to be constructed, code at every stage will be designed with modularity in mind. It is important to note that the digital to char stage depends on the previous sampling and ASK to digital conversion stages. 
 
-The ASK to digital conversion stage is expected to be the most laborious, given sampling and digital to char conversion are relatively simple. Therefore, the current timeline will focus on implementing all four stages represented in Fig. 1 in parallel, with a higher consideration for the analog to digital stage, then finally linking them together using scheduling algorithms. Implementing scheduling policies will be the last stage of development.
+The ASK to digital conversion stage is expected to be the most laborious, given sampling and digital to char conversion are relatively simple. Therefore, the current timeline will focus on implementing all four stages represented in Fig. 1 in parallel, with a higher consideration for the analog to digital stage, then finally linking them together using scheduling algorithms. Implementing scheduling policies will be the last stage of development. Unit tests will be developed for code at each stage.
 
 
 \section{Closure}
