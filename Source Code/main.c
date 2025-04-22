@@ -4,7 +4,7 @@
 int main() {
     Node* morseTree = buildMorseTree();
 
-    // Test decoding                                                                 should return:
+    // Test decoding                                                                         should return:
     printf("Morse '.' -> %c\n", decodeMorse(morseTree, "."));                        // e
     printf("Morse '-' -> %c\n", decodeMorse(morseTree, "-"));                        // t
     printf("Morse '. -' -> %c\n", decodeMorse(morseTree, ". -"));                    // a
@@ -13,9 +13,7 @@ int main() {
     printf("Morse '. - - - -' -> %c\n", decodeMorse(morseTree, ". - - - -"));        // 1
     printf("Morse '. . - - -' -> %c\n", decodeMorse(morseTree, ". . - - -"));        // 2
     printf("Morse '. . . - -' -> %c\n", decodeMorse(morseTree, ". . . - -"));        // 3
-
-    // Free allocated memory
-    freeMorseTree(morseTree);
+    printf("Morse '- - -' -> %c\n", decodeMorse(morseTree, "- - -"));                // o
 
     return 0;
 }
