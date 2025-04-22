@@ -1,26 +1,39 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "morsetree.h"
+#define MAX_NODES 100
+#define NULL_PTR ((void*)0)  // NULL replacement
 
-// Function to create a new node
-Node* createNode() {
-    Node* newNode = (Node*)malloc(sizeof(Node));
+typedef struct Node {
+    char letter;
+    struct Node* dot;
+    struct Node* dash;
+} Node;
+
+// Static memory pool
+static Node nodePool[MAX_NODES];
+static int nodeIndex = 0;
+
+// Create a new node using static pool
+static Node* createNode() {
+    if (nodeIndex >= MAX_NODES) {
+        return NULL_PTR;  // Pool exhausted
+    }
+
+    Node* newNode = &nodePool[nodeIndex++];
     newNode->letter = '\0';  // Empty by default
-    newNode->dot = NULL;
-    newNode->dash = NULL;
+    newNode->dot = NULL_PTR;
+    newNode->dash = NULL_PTR;
     return newNode;
 }
 
 // Function to insert a character into the Morse tree
-void insertMorse(Node* root, const char* morse, char letter) {
+static void insertMorse(Node* root, const char* morse, char letter) {
     Node* current = root;
 
     while (*morse) {
         if (*morse == '.') {
-            if (!current->dot) current->dot = createNode();  // Create node if missing
+            if (current->dot == NULL_PTR) current->dot = createNode();  // Create node if missing
             current = current->dot;
         } else if (*morse == '-') {
-            if (!current->dash) current->dash = createNode();
+            if (current->dash == NULL_PTR) current->dash = createNode();
             current = current->dash;
         }
         morse++;
@@ -29,8 +42,9 @@ void insertMorse(Node* root, const char* morse, char letter) {
     current->letter = letter;  // Store the character at the leaf node
 }
 
-// Function to build the complete Morse Code tree
+// Function to build complete Morse Code tree
 Node* buildMorseTree() {
+    nodeIndex = 0;  // Reset pool
     Node* root = createNode();  // Root is empty
 
     /*
@@ -126,23 +140,18 @@ char decodeMorse(Node* root, const char* morse) {
     Node* current = root;
 
     while (*morse) {
+
+        // Invalid Morse sequence check
         if (*morse == '.') {
-            if (!current->dot) return '?';  // Invalid Morse sequence
+            if (current->dot == NULL_PTR) return '?';
             current = current->dot;
         } else if (*morse == '-') {
-            if (!current->dash) return '?';
+            if (current->dash == NULL_PTR) return '?';
             current = current->dash;
         }
+
         morse++;
     }
 
-    return (current->letter != '\0') ? current->letter : '?';  // Return character if valid
-}
-
-// Function to free memory allocated for tree
-void freeMorseTree(Node* root) {
-    if (root == NULL) return;
-    freeMorseTree(root->dot);
-    freeMorseTree(root->dash);
-    free(root);
+    return (current && current->letter != '\0') ? current->letter : '?';  // Return character if valid
 }
