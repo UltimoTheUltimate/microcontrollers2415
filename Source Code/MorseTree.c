@@ -12,7 +12,7 @@ static Node nodePool[MAX_NODES];
 static int nodeIndex = 0;
 
 // Create a new node using static pool
-static Node* createNode() {
+Node* createNode() {
     if (nodeIndex >= MAX_NODES) {
         return NULL_PTR;  // Pool exhausted
     }
@@ -25,7 +25,7 @@ static Node* createNode() {
 }
 
 // Function to insert a character into the Morse tree
-static void insertMorse(Node* root, const char* morse, char letter) {
+void insertMorse(Node* root, const char* morse, char letter) {
     Node* current = root;
 
     while (*morse) {
