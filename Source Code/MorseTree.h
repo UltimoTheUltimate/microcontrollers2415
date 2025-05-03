@@ -9,7 +9,7 @@ typedef struct Node {
 } Node;
 
 // Function declarations
-static Node* createNode();
+Node* createNode();
 void insertMorse(Node* root, const char* morse, char letter);
 Node* buildMorseTree();
 char decodeMorse(Node* root, const char* morse);
