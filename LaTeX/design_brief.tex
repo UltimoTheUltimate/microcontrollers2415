@@ -1,5 +1,4 @@
 \documentclass{cce2014-design}
-\svnInfo $Id$
 
 % Document details
 \title{Design Brief: Group 5}
@@ -37,12 +36,12 @@ The initial design plan will follow the outline shown in figure 1. Initially, th
 
 The LPC4088 microcontroller, with its integrated Analog-to-Digital Converter (ADC) and high-speed processing capabilities, is particularly well-suited for sampling the analog ASK signal and performing the necessary signal processing. The microcontroller's Direct Memory Access (DMA) feature will allow efficient data transfer from the ADC to memory, reducing processor load and enabling fast, real-time processing.
 
-\subsection{Signal Sampling and Conversion to a Digital Signal}
+\subsection{Signal Sampling and Conversion to a Digital Signal DANIEL READ AND CHECK}
 The sampling and demodulation part is responsible for converting the amplitude shift keyed waveform into a binary high or low internal output, which is necessary for conversion into dots and dashes. The LPC4088’s ADC, capable of 12-bit resolution, will be used to sample the analogue input signal with high precision. The microcontroller can sample data at high rates, ensuring that the timing between samples is accurate.
 
 For sampling, the receiver will use the analogue pins of the microcontroller to sample every \( T \) time and save the contents to a queue. Given the high-resolution capabilities of the LPC4088’s ADC, the system will be able to capture small variations in the signal, which will be crucial for accurately distinguishing between dots and dashes in Morse code. There are many ways to protect the analogue pin from overvoltage, such as using a 3.3V Zener diode or TVS diode in parallel with the output and some biasing resistors if voltage stepping down is necessary.
 
-As for digital conversion, to determine the presence of the ASK signal, a Fourier transform algorithm will be used on the queue of analogue values to identify the frequency components. The presence of the frequency used in the ASK signal at a reasonable magnitude will be considered as a 1, and the lack of it, a 0. This value will be passed to the next stage responsible for Morse code translation.
+As for digital conversion, to determine the presence of the ASK signal, the initial thouhgt was to implement a Fourier transform algorithm for a queue of analogue values to identify the frequency components, however it was determined that this would be too computationally expensive to implement on the MCU, especially when considering a Fourier transform is designed to analyze a vast spectrum of frequencies, making it overkill for a Morse code WAV file, which has a small range of target frequencies. The next approach was to implement Goertzel's algorithm, which would allow for targeting desired frequencies in a much simpler fashion. Working implementations of this were devized and showed promise, but the finalized approach was using signal processing. The Morse code receiver was designed to convert analogue samples to digital samples through rectification of the signal via breadboard circuits to produce a digital waveform. Using this waveform, the presence of the frequency used in the ASK signal at a reasonable magnitude will be considered as a 1, and the lack of it, a 0. This value will be passed to the next stage responsible for Morse code translation.
 
 To ensure accurate and consistent sampling intervals, the LPC4088’s SysTick timer will be utilized. This will trigger periodic interrupts, ensuring that the sampling happens at precise intervals and that short, unwanted pulses don’t affect the signal. The timer will be configured to trigger an ADC conversion at consistent time intervals, thus preserving the signal’s integrity for further processing.
 
@@ -58,7 +57,7 @@ Due to the binary nature of Morse code, it allows the use of a binary tree struc
 
 Our implementation will extend this tree to include traversals to nodes that map to all characters or symbols in the Morse code document. The LPC4088's ARM Cortex-M4 processor will handle the traversal of the tree with minimal latency, thanks to its high clock speed and efficient execution of binary search algorithms.
 
-The microcontroller will receive signals and, based on a defined unit length, will determine if it is a dot (of unit length) or a dash (of 3 unit lengths), and decode the signal using the binary tree. The efficiency of the tree traversal is key to ensuring the system responds quickly, decoding Morse code in O(log$_2$ n) time. This structure will be optimized to handle large inputs and scale effectively with increasing signal complexity.
+The microcontroller will receive signals and, based on a defined unit length, will determine if it is a dot (of unit length) or a dash (of 3 unit lengths), and decode the signal using the binary tree. The efficiency of the tree traversal is key to ensuring the system responds quickly, decoding Morse code in O(n) time, where n is the number of steps (dots or dashes) on a guided walk through the tree to decode a given character. This structure will be optimized to handle large inputs and scale effectively with increasing signal complexity.
 
 \subsection{LCD Display}
 To display the translated Morse code signal on the LCD, predefined functions from Lab 4 will be used. Functions such as \textit{lcd\_write\_data}, \textit{lcd\_put\_char}, and \textit{lcd\_print} allow us to project our Morse code translations to the LCD screen. The LPC4088 microcontroller supports multiple communication protocols (SPI, I2C, or parallel data) for interfacing with LCDs. In our case, we will be using SPI for data transmission due to its efficiency in sending data to the display.
@@ -66,7 +65,7 @@ To display the translated Morse code signal on the LCD, predefined functions fro
 The \textit{lcd\_put\_char} function is responsible for displaying individual characters, while \textit{lcd\_print} allows for printing entire strings. These functions utilize a serial-to-parallel shift register on the LPC4088, which minimizes the number of pins needed to 3 GPIO pins, optimizing hardware resource usage while maintaining efficient data communication with the LCD module. The functions in \textit{lcd.c} send data to the LCD in 4-bit mode, meaning any 8-bit character is split into two 4-bit chunks before being sent to the LCD. Scrolling or text-wrapping functionality could be added to ensure long outputs are sufficiently represented even if they exceed the LCD's dimensions.
 
 \subsection{Scheduling}
-As all functions depend on data provided by previous functions, out-of-order execution is inevitable to have a remotely efficient implementation. Thus, it is best that when a function finishes execution and generates new data (e.g., digital conversion), an interrupt is raised for the next function (Morse code translation) to run. Most functions aren’t time-critical and thus do not need high priority, except sampling, where the time between samples must be equal. Thus, if a sample is needed, it takes precedence.
+Most functions aren’t time-critical and thus do not need high priority, except sampling, where the time between samples must be equal. Thus, if a sample is needed, it takes precedence.
 
 The LPC4088’s interrupt controller will be used to handle scheduling tasks effectively. Interrupts will be raised at key stages in the signal processing pipeline, such as after each sample is taken or after the completion of the Morse code translation, triggering the next task. By leveraging interrupts, the system ensures efficient and responsive task management.
 
