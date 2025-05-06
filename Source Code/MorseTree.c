@@ -145,6 +145,9 @@ char decodeMorse(Node* root, const int* morse, int length) {
         } else if (morse[i] == 1) {
             if (current->dash == NULL_PTR) return '?';
             current = current->dash;
+        } else {
+            // Invalid input: only 0 or 1 allowed
+            return '?';
         }
     }
     return (current && current->letter != '\0') ? current->letter : '?';
