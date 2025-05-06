@@ -63,6 +63,7 @@ int main() {
     printf("Morse '- - -' -> %c\n", decodeMorse(root, (int[]){1,1,1}, 3));         // 111 (- - -) should print o
 
     printf("Morse '- . . -' -> %c\n", decodeMorse(root, (int[]){1,0,0,1}, 4)); // 1001 (- . . -) should print x
+    printf("Morse '7 . . -' -> %c\n", decodeMorse(root, (int[]){7,0,0,1}, 4)); // 7001 (7 . . -) should print ? via error
 
     return 0;
 }
