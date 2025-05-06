@@ -10,8 +10,8 @@ typedef struct Node {
 
 // Function declarations
 Node* createNode();
-void insertMorse(Node* root, const char* morse, char letter);
+void insertMorse(Node* root, const int* morse, int length, char letter);
 Node* buildMorseTree();
-char decodeMorse(Node* root, const char* morse);
+char decodeMorse(Node* root, const int* morse, int length);
 
 #endif
