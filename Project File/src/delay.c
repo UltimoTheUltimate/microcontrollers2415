@@ -1,6 +1,10 @@
 #include <platform.h>
-#include <stdint.h>
 #include "delay.h"
+
+// Define UINT32_MAX manually
+#ifndef UINT32_MAX
+#define UINT32_MAX 4294967295U
+#endif
 
 void delay_ms(unsigned int ms) {
 	unsigned int max_step = 1000 * (UINT32_MAX / CLK_FREQ);
