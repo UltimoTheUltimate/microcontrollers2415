@@ -1,21 +1,22 @@
 /*!
- * \file      queue.h
+ * \file      squeue.h
  * \brief     Implements a queue (FIFO) data structure.
  * \copyright ARM University Program &copy; ARM Ltd 2014.
  */
-#ifndef QUEUE_H
-#define QUEUE_H
-#include <stdint.h>
+#ifndef SQUEUE_H
+#define SQUEUE_H
+
+#define QUEUE_MAX_SIZE 30  // set as needed
 
 /*! This structure encapsulates the queue data structure.
  *  It should not be modified directly. Any modifications should
  *  be carried out by the functions provided by queue.h.
  */
 typedef struct {
-	int* data; //!< Array of data, stored on the heap.
-	uint32_t head; //!< Index in the array of the oldest element.
-	uint32_t tail; //!< Index in the array of the youngest element.
-	uint32_t size; //!< Size of the data array.
+    int data[QUEUE_MAX_SIZE];
+    unsigned int head;
+    unsigned int tail;
+    unsigned int size;
 } Queue;
 
 /*! \brief Initialises the supplied queue structure to the
@@ -26,7 +27,15 @@ typedef struct {
  *  \return True (1) if the operation is successful, false (0)
  *          otherwise.
  */
-int queue_init(Queue *queue, uint32_t size);
+int queue_init(Queue *queue, unsigned int size) {
+    if (size > QUEUE_MAX_SIZE) {
+        return 1;  // return 1 if size too large, else 0
+    }
+    queue->head = 0;
+    queue->tail = 0;
+    queue->size = size;
+    return 0;
+}
 
 /*! \brief Adds an item to the back of the queue.
  *  \param queue Queue structure to operate on.
@@ -57,4 +66,6 @@ int queue_is_full(Queue *queue);
  */
 int queue_is_empty(Queue *queue);
 
-#endif // QUEUE_H
+// *******************************ARM University Program Copyright © ARM Ltd 2014*************************************
+
+#endif //SQUEUE_H
