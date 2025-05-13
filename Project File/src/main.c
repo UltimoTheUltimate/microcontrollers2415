@@ -1,5 +1,4 @@
 #include <platform.h>
-#include "tone.h"
 #include "leds.h"
 #include "timer.h"
 #include "comparator.h"
@@ -51,6 +50,9 @@ int main(void)
     timer_set_callback(sample);  // Set callback function for timer
     timer_enable();              // Start timer
     leds_set(0, 0, 0);           // Turn off all LEDs
+    lcd_init();                  // Initialize LCD
+    // lcd_clear();          not sure if these are needed
+    // lcd_set_cursor(0, 0);
 
     // Initialize the queues
     queue_init(&Average_data.queue0lens, QUEUE_SIZE);
