@@ -7,6 +7,14 @@ typedef struct {
     unsigned int size;
 } Queue;
 
+
+int queue_size(Queue *queue) {
+    if (queue->tail >= queue->head)
+        return queue->tail - queue->head;
+    else
+        return queue->size - (queue->head - queue->tail);
+}
+
 int queue_init(Queue *queue, unsigned int size) {
     if (size > QUEUE_MAX_SIZE) {
         return 1;  // return 1 if size too large, else 0

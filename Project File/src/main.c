@@ -4,7 +4,7 @@
 #include "comparator.h"
 #include "lcd.h"
 #include "squeue.h"
-#include "morsetree.h"
+#include "MorseTree.h"
 
 #define QUEUE_SIZE 10  // Define the size of the queues
 
@@ -26,6 +26,24 @@ struct average_data
 volatile int sample_ready = 0;   // Flag to indicate if a sample is ready
 volatile int sampled_value = 0;  // Variable to store the sampled value
 
+void lcd_scroll_sample(int value) {
+    static int lcd_pos = 0;
+    char c = value ? '1' : '0';
+
+    // Move cursor to the current position
+    lcd_set_cursor(0, lcd_pos);
+    lcd_put_char(c);
+
+    // Advance position, wrap around if at end of line (assuming 16x2 LCD)
+    lcd_pos++;
+    if (lcd_pos >= 16) {
+        lcd_pos = 0;
+        lcd_set_cursor(0, 0);
+        // Optionally clear the row or overwrite
+    }
+}
+
+
 void sample()
 {
     if (comparator_read())
@@ -33,14 +51,18 @@ void sample()
         leds_set(1, 1, 0);
         sample_ready = 1;   // Set flag to indicate sample is ready
         sampled_value = 1;  // Store the sampled value
+        lcd_scroll_sample(sampled_value);  // Scroll the sampled value on LCD
+        
     }
     else
     {
         leds_set(0, 0, 1);
         sample_ready = 1;   // Set flag to indicate sample is ready
         sampled_value = 0;  // Store the sampled value
+        lcd_scroll_sample(sampled_value);  // Scroll the sampled value on LCD
     }
 }
+
 
 int main(void)
 {

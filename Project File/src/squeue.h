@@ -27,6 +27,14 @@ typedef struct {
  *  \return True (1) if the operation is successful, false (0)
  *          otherwise.
  */
+
+/*! \brief Returns the current number of elements in the queue.
+ *  \param queue Queue structure to operate on.
+ *  \return The number of elements currently in the queue.
+ */
+unsigned int queue_size(Queue *queue);
+
+
 int queue_init(Queue *queue, unsigned int size) {
     if (size > QUEUE_MAX_SIZE) {
         return 1;  // return 1 if size too large, else 0
