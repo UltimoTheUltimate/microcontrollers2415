@@ -11,12 +11,13 @@
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060020::V5.06 (build 20)::ARMCC</pCCUsed>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>LPC4088FET208</Device>
           <Vendor>NXP</Vendor>
-          <PackID>Keil.LPC4000_DFP.1.1.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.LPC4000_DFP.2.2.2</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IROM(0x00000000,0x80000) IRAM(0x10000000,0x10000) IRAM2(0x20000000,0x8000) CPUTYPE("Cortex-M4") FPU2 CLOCK(120000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -125,47 +126,6 @@
             <HexOffset>0</HexOffset>
             <Oh166RecLen>16</Oh166RecLen>
           </OPTHX>
-          <Simulator>
-            <UseSimulator>0</UseSimulator>
-            <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
-            <RunToMain>1</RunToMain>
-            <RestoreBreakpoints>1</RestoreBreakpoints>
-            <RestoreWatchpoints>1</RestoreWatchpoints>
-            <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
-            <RestoreFunctions>1</RestoreFunctions>
-            <RestoreToolbox>1</RestoreToolbox>
-            <LimitSpeedToRealTime>0</LimitSpeedToRealTime>
-            <RestoreSysVw>1</RestoreSysVw>
-          </Simulator>
-          <Target>
-            <UseTarget>1</UseTarget>
-            <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
-            <RunToMain>1</RunToMain>
-            <RestoreBreakpoints>1</RestoreBreakpoints>
-            <RestoreWatchpoints>1</RestoreWatchpoints>
-            <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
-            <RestoreFunctions>0</RestoreFunctions>
-            <RestoreToolbox>1</RestoreToolbox>
-            <RestoreTracepoints>1</RestoreTracepoints>
-            <RestoreSysVw>1</RestoreSysVw>
-          </Target>
-          <RunDebugAfterBuild>0</RunDebugAfterBuild>
-          <TargetSelection>12</TargetSelection>
-          <SimDlls>
-            <CpuDll></CpuDll>
-            <CpuDllArguments></CpuDllArguments>
-            <PeripheralDll></PeripheralDll>
-            <PeripheralDllArguments></PeripheralDllArguments>
-            <InitializationFile></InitializationFile>
-          </SimDlls>
-          <TargetDlls>
-            <CpuDll></CpuDll>
-            <CpuDllArguments></CpuDllArguments>
-            <PeripheralDll></PeripheralDll>
-            <PeripheralDllArguments></PeripheralDllArguments>
-            <InitializationFile></InitializationFile>
-            <Driver>BIN\CMSIS_AGDI.dll</Driver>
-          </TargetDlls>
         </DebugOption>
         <Utilities>
           <Flash1>
@@ -224,6 +184,9 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>2</RvdsVP>
+            <RvdsMve>0</RvdsMve>
+            <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -364,11 +327,15 @@
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
             <uC99>0</uC99>
+            <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>0</v6Lang>
             <v6LangP>0</v6LangP>
             <vShortEn>0</vShortEn>
             <vShortWch>0</vShortWch>
+            <v6Lto>0</v6Lto>
+            <v6WtE>0</v6WtE>
+            <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -386,6 +353,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
+            <ClangAsOpt>1</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -512,24 +480,44 @@
               <FilePath>.\src\delay.h</FilePath>
             </File>
             <File>
-              <FileName>tone.c</FileName>
+              <FileName>lcd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\tone.c</FilePath>
+              <FilePath>.\src\lcd.c</FilePath>
             </File>
             <File>
-              <FileName>tone.h</FileName>
+              <FileName>lcd.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\src\tone.h</FilePath>
+              <FilePath>.\src\lcd.h</FilePath>
             </File>
             <File>
-              <FileName>queue.c</FileName>
+              <FileName>leds.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\queue.c</FilePath>
+              <FilePath>.\src\leds.c</FilePath>
             </File>
             <File>
-              <FileName>queue.h</FileName>
+              <FileName>MorseTree.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\MorseTree.c</FilePath>
+            </File>
+            <File>
+              <FileName>squeue.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\squeue.c</FilePath>
+            </File>
+            <File>
+              <FileName>squeue.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\src\queue.h</FilePath>
+              <FilePath>.\src\squeue.h</FilePath>
+            </File>
+            <File>
+              <FileName>leds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\leds.h</FilePath>
+            </File>
+            <File>
+              <FileName>MorseTree.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\MorseTree.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -560,18 +548,34 @@
       </component>
     </components>
     <files>
-      <file attr="config" category="source" name="Device\Source\ARM\startup_LPC407x_8x_177x_8x.s">
-        <instance index="0">RTE\Device\LPC4088FET208\startup_LPC407x_8x_177x_8x.s</instance>
-        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="LPC4000 CMSIS Device"/>
-        <package name="LPC4000_DFP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.0.0"/>
+      <file attr="config" category="header" name="RTE_Driver\Config\RTE_Device.h" version="2.0.0">
+        <instance index="0">RTE\Device\LPC4088FET208\RTE_Device.h</instance>
+        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.1" condition="LPC40xx CMSIS"/>
+        <package name="LPC4000_DFP" schemaVersion="1.7.2" url="https://www.keil.com/pack/" vendor="Keil" version="2.2.2"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </file>
-      <file attr="config" category="source" name="Device\Source\system_LPC407x_8x_177x_8x.c">
+      <file attr="config" category="source" condition="Compiler ARMCC" name="Device\Source\ARM\startup_LPC407x_8x_177x_8x.s" version="1.0.0">
+        <instance index="0">RTE\Device\LPC4088FET208\startup_LPC407x_8x_177x_8x.s</instance>
+        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.1" condition="LPC40xx CMSIS"/>
+        <package name="LPC4000_DFP" schemaVersion="1.7.2" url="https://www.keil.com/pack/" vendor="Keil" version="2.2.2"/>
+        <targetInfos>
+          <targetInfo name="Target 1"/>
+        </targetInfos>
+      </file>
+      <file attr="config" category="source" name="Device\Source\system_LPC407x_8x_177x_8x.c" version="1.0.0">
         <instance index="0">RTE\Device\LPC4088FET208\system_LPC407x_8x_177x_8x.c</instance>
-        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="LPC4000 CMSIS Device"/>
-        <package name="LPC4000_DFP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.0.0"/>
+        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.1" condition="LPC40xx CMSIS"/>
+        <package name="LPC4000_DFP" schemaVersion="1.7.2" url="https://www.keil.com/pack/" vendor="Keil" version="2.2.2"/>
+        <targetInfos>
+          <targetInfo name="Target 1"/>
+        </targetInfos>
+      </file>
+      <file attr="config" category="header" name="Device\Include\system_LPC407x_8x_177x_8x.h" version="1.0.0">
+        <instance index="0">RTE\Device\LPC4088FET208\system_LPC407x_8x_177x_8x.h</instance>
+        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.1" condition="LPC40xx CMSIS"/>
+        <package name="LPC4000_DFP" schemaVersion="1.7.2" url="https://www.keil.com/pack/" vendor="Keil" version="2.2.2"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
