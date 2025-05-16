@@ -26,6 +26,17 @@ struct average_data
 volatile int sample_ready = 0;   // Flag to indicate if a sample is ready
 volatile int sampled_value = 0;  // Variable to store the sampled value
 
+
+Node* morseRoot;
+    int morseBuffer[10];  // adjustable
+    int morseIndex = 0;
+    int symbol_space_threshold;
+    int char_space_threshold;
+    char decoded;
+    int i;
+
+
+
 void lcd_scroll_sample(int value) {
     static int lcd_pos = 0;
     char c = value ? '1' : '0';
@@ -66,6 +77,9 @@ void sample()
 
 int main(void)
 {
+    // Variable declarations moved to the top
+    
+
     leds_init();                 // Initialize LEDs
     timer_init(100000);          // Initialize timer
     comparator_init();           // Initialize comparator
@@ -81,11 +95,7 @@ int main(void)
     queue_init(&Average_data.queue1lens, QUEUE_SIZE);
 
     // Initialize Morse tree
-    Node* morseRoot = buildMorseTree();
-
-    // Morse decoding buffer
-    int morseBuffer[10];  // adjustable
-    int morseIndex = 0;
+    morseRoot = buildMorseTree();
 
     while (1)
     {
@@ -109,7 +119,7 @@ int main(void)
             {
                 // Store the count in the appropriate queue
                 if (sampled_value)
-                {
+                { 
                     if (!queue_enqueue(&Average_data.queue1lens, Average_data.count))
                     {
                         queue_dequeue(&Average_data.queue1lens, &Average_data.value);  // Dequeue if full
@@ -117,7 +127,7 @@ int main(void)
 
                     Average_data.sum1 = 0;
                     Average_data.size1 = queue_size(&Average_data.queue1lens);
-                    for (int i = 0; i < Average_data.size1; i++)
+                    for (i = 0; i < Average_data.size1; i++)
                     {
                         queue_dequeue(&Average_data.queue1lens, &Average_data.value);
                         Average_data.sum1 += Average_data.value;
@@ -148,7 +158,7 @@ int main(void)
 
                     Average_data.sum0 = 0;
                     Average_data.size0 = queue_size(&Average_data.queue0lens);
-                    for (int i = 0; i < Average_data.size0; i++)
+                    for (i = 0; i < Average_data.size0; i++)
                     {
                         queue_dequeue(&Average_data.queue0lens, &Average_data.value);
                         Average_data.sum0 += Average_data.value;
@@ -157,8 +167,8 @@ int main(void)
                     Average_data.avg0 = Average_data.sum0 / Average_data.size0;  // Calculate the average
 
                     // Define thresholds for spaces
-                    int symbol_space_threshold = Average_data.avg0 * 2;  // Example: 2x avg0
-                    int char_space_threshold = Average_data.avg0 * 5;    // Example: 5x avg0
+                    symbol_space_threshold = Average_data.avg0 * 2;  // Example: 2x avg0
+                    char_space_threshold = Average_data.avg0 * 5;    // Example: 5x avg0
 
                     // Classify the space
                     if (Average_data.count < symbol_space_threshold)
@@ -173,7 +183,7 @@ int main(void)
                         leds_set(1, 1, 0);  // Turn on yellow LED (example for character space)
                         // Handle character space
                         if (morseIndex > 0) {
-                            char decoded = decodeMorse(morseRoot, morseBuffer, morseIndex);
+                            decoded = decodeMorse(morseRoot, morseBuffer, morseIndex);
                             lcd_put_char(decoded);  // or printf("%c", decoded);
                             morseIndex = 0;
                         }
@@ -184,7 +194,7 @@ int main(void)
                         leds_set(1, 0, 1);  // Turn on purple LED (example for word space)
                         // Handle word space
                         if (morseIndex > 0) {
-                            char decoded = decodeMorse(morseRoot, morseBuffer, morseIndex);
+                            decoded = decodeMorse(morseRoot, morseBuffer, morseIndex);
                             lcd_put_char(decoded);
                             morseIndex = 0;
                         }

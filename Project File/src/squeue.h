@@ -35,15 +35,7 @@ typedef struct {
 unsigned int queue_size(Queue *queue);
 
 
-int queue_init(Queue *queue, unsigned int size) {
-    if (size > QUEUE_MAX_SIZE) {
-        return 1;  // return 1 if size too large, else 0
-    }
-    queue->head = 0;
-    queue->tail = 0;
-    queue->size = size;
-    return 0;
-}
+int queue_init(Queue *queue, unsigned int size);
 
 /*! \brief Adds an item to the back of the queue.
  *  \param queue Queue structure to operate on.

@@ -11,12 +11,69 @@ typedef struct Node {
 static Node nodePool[MAX_NODES];
 static int nodeIndex = 0;
 
+// Morse code arrays moved to file scope for C89 compliance
+static int e[] = {0};
+static int t[] = {1};
+static int i_[] = {0,0};
+static int a[] = {0,1};
+static int n[] = {1,0};
+static int m[] = {1,1};
+static int s[] = {0,0,0};
+static int u[] = {0,0,1};
+static int r[] = {0,1,0};
+static int w[] = {0,1,1};
+static int d[] = {1,0,0};
+static int k[] = {1,0,1};
+static int g[] = {1,1,0};
+static int o[] = {1,1,1};
+static int h[] = {0,0,0,0};
+static int v[] = {0,0,0,1};
+static int f[] = {0,0,1,0};
+static int l[] = {0,1,0,0};
+static int p[] = {0,1,1,0};
+static int j[] = {0,1,1,1};
+static int b[] = {1,0,0,0};
+static int x[] = {1,0,0,1};
+static int c[] = {1,0,1,0};
+static int y[] = {1,0,1,1};
+static int z[] = {1,1,0,0};
+static int q[] = {1,1,0,1};
+static int five[] = {0,0,0,0,0};
+static int four[] = {0,0,0,0,1};
+static int understood[] = {0,0,0,1,0};
+static int three[] = {0,0,0,1,1};
+static int two[] = {0,0,1,1,1};
+static int wait[] = {0,1,0,0,0};
+static int plus[] = {0,1,0,1,0};
+static int one[] = {0,1,1,1,1};
+static int six[] = {1,0,0,0,0};
+static int equal[] = {1,0,0,0,1};
+static int slash[] = {1,0,0,1,0};
+static int start[] = {1,0,1,0,1};
+static int open_brack[] = {1,0,1,1,0};
+static int seven[] = {1,1,0,0,0};
+static int eight[] = {1,1,1,0,0};
+static int nine[] = {1,1,1,1,0};
+static int zero[] = {1,1,1,1,1};
+static int end_work[] = {0,0,0,1,0,1};
+static int question[] = {0,0,1,1,0,0};
+static int quote[] = {0,1,0,0,1,0};
+static int period[] = {0,1,0,1,0,1};
+static int at[] = {0,1,1,0,1,0};
+static int apostrophe[] = {0,1,1,1,1,0};
+static int dash[] = {1,0,0,0,0,1};
+static int close_brack[] = {1,0,1,1,0,1};
+static int comma[] = {1,1,0,0,1,1};
+static int colon[] = {1,1,1,0,0,0};
+static int error[] = {0,0,0,0,0,0,0,0};
+Node* root;
 // Create a new node using static pool
 Node* createNode() {
+    Node* newNode;
     if (nodeIndex >= MAX_NODES) {
         return NULL_PTR;
     }
-    Node* newNode = &nodePool[nodeIndex++];
+    newNode = &nodePool[nodeIndex++];
     newNode->letter = '\0';
     newNode->dot = NULL_PTR;
     newNode->dash = NULL_PTR;
@@ -26,7 +83,8 @@ Node* createNode() {
 // Function to insert a character into the Morse tree
 void insertMorse(Node* root, const int* morse, int length, char letter) {
     Node* current = root;
-    for (int i = 0; i < length; i++) {
+    int i; // declaration moved to top
+    for (i = 0; i < length; i++) {
         if (morse[i] == 0) {
             if (current->dot == NULL_PTR) current->dot = createNode();
             current = current->dot;
@@ -41,63 +99,8 @@ void insertMorse(Node* root, const int* morse, int length, char letter) {
 // Function to build complete Morse Code tree
 Node* buildMorseTree() {
     nodeIndex = 0;  // reset pool
-    Node* root = createNode();  // root is empty
-
-    // Move all variable declarations here
-    int e[] = {0};
-    int t[] = {1};
-    int i[] = {0,0};
-    int a[] = {0,1};
-    int n[] = {1,0};
-    int m[] = {1,1};
-    int s[] = {0,0,0};
-    int u[] = {0,0,1};
-    int r[] = {0,1,0};
-    int w[] = {0,1,1};
-    int d[] = {1,0,0};
-    int k[] = {1,0,1};
-    int g[] = {1,1,0};
-    int o[] = {1,1,1};
-    int h[] = {0,0,0,0};
-    int v[] = {0,0,0,1};
-    int f[] = {0,0,1,0};
-    int l[] = {0,1,0,0};
-    int p[] = {0,1,1,0};
-    int j[] = {0,1,1,1};
-    int b[] = {1,0,0,0};
-    int x[] = {1,0,0,1};
-    int c[] = {1,0,1,0};
-    int y[] = {1,0,1,1};
-    int z[] = {1,1,0,0};
-    int q[] = {1,1,0,1};
-    int five[] = {0,0,0,0,0};
-    int four[] = {0,0,0,0,1};
-    int understood[] = {0,0,0,1,0};
-    int three[] = {0,0,0,1,1};
-    int two[] = {0,0,1,1,1};
-    int wait[] = {0,1,0,0,0};
-    int plus[] = {0,1,0,1,0};
-    int one[] = {0,1,1,1,1};
-    int six[] = {1,0,0,0,0};
-    int equal[] = {1,0,0,0,1};
-    int slash[] = {1,0,0,1,0};
-    int start[] = {1,0,1,0,1};
-    int open_brack[] = {1,0,1,1,0};
-    int seven[] = {1,1,0,0,0};
-    int eight[] = {1,1,1,0,0};
-    int nine[] = {1,1,1,1,0};
-    int zero[] = {1,1,1,1,1};
-    int end_work[] = {0,0,0,1,0,1};
-    int question[] = {0,0,1,1,0,0};
-    int quote[] = {0,1,0,0,1,0};
-    int period[] = {0,1,0,1,0,1};
-    int at[] = {0,1,1,0,1,0};
-    int apostrophe[] = {0,1,1,1,1,0};
-    int dash[] = {1,0,0,0,0,1};
-    int close_brack[] = {1,0,1,1,0,1};
-    int comma[] = {1,1,0,0,1,1};
-    int colon[] = {1,1,1,0,0,0};
-    int error[] = {0,0,0,0,0,0,0,0};
+    
+    root = createNode();  // root is empty
 
     /*
      * Characters are added to the tree in the order they would appear in a breadth-first traversal
@@ -115,7 +118,7 @@ Node* buildMorseTree() {
     insertMorse(root, t, 1, 't');
 
     // 2 symbol characters, len = 2, 4 characters
-    insertMorse(root, i, 2, 'i');
+    insertMorse(root, i_, 2, 'i');
     insertMorse(root, a, 2, 'a');
     insertMorse(root, n, 2, 'n');
     insertMorse(root, m, 2, 'm');
@@ -126,7 +129,7 @@ Node* buildMorseTree() {
     insertMorse(root, r, 3, 'r');
     insertMorse(root, w, 3, 'w');
     insertMorse(root, d, 3, 'd');
-    insertMorse(root, k, 3, 'k');  // is also invitation to transmit
+    insertMorse(root, k, 3, 'k');
     insertMorse(root, g, 3, 'g');
     insertMorse(root, o, 3, 'o');
 
@@ -186,7 +189,8 @@ Node* buildMorseTree() {
 // Function to decode a Morse code sequence
 char decodeMorse(Node* root, const int* morse, int length) {
     Node* current = root;
-    for (int i = 0; i < length; i++) {
+    int i; // declaration moved to top
+    for (i = 0; i < length; i++) {
         if (morse[i] == 0) {
             if (current->dot == NULL_PTR) return '?';
             current = current->dot;
