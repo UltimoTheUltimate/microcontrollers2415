@@ -28,12 +28,14 @@ volatile int sampled_value = 0;  // Variable to store the sampled value
 
 
 Node* morseRoot;
-    int morseBuffer[10];  // adjustable
-    int morseIndex = 0;
-    int symbol_space_threshold;
-    int char_space_threshold;
-    char decoded;
-    int i;
+int morseBuffer[10];  // Morse buffer, adjustable
+int morseIndex = 0;
+char decodedMessage[100] = {0};  // string buffer, adjustable
+int messageIndex = 0;
+int symbol_space_threshold;
+int char_space_threshold;
+char decoded;
+int i;
 
 
 
@@ -61,7 +63,7 @@ void sample()
 int main(void)
 {
     // Variable declarations moved to the top
-    
+
 
     leds_init();                 // Initialize LEDs
     timer_init(2000000);          // Initialize timer
@@ -102,7 +104,7 @@ int main(void)
             {
                 // Store the count in the appropriate queue
                 if (sampled_value)
-                { 
+                {
                     if (!queue_enqueue(&Average_data.queue1lens, Average_data.count))
                     {
                         queue_dequeue(&Average_data.queue1lens, &Average_data.value);  // Dequeue if full
@@ -121,7 +123,7 @@ int main(void)
                     if(Average_data.count > Average_data.avg1)  // Dash
                     {
                         // handle dash
-                        
+
                         morseBuffer[morseIndex++] = 1;
                         lcd_clear();
                         lcd_print("DASH ");
@@ -129,7 +131,7 @@ int main(void)
                     else // Dot
                     {
                         // handle dot
-                        
+
                         morseBuffer[morseIndex++] = 0;
                         lcd_clear();
                         lcd_print("DOT  ");
@@ -161,7 +163,7 @@ int main(void)
                     if (Average_data.count < symbol_space_threshold)
                     {
                         // Symbol space
-                        
+
                         lcd_clear();
                         lcd_print("SYM ");
                         // Handle symbol space, still in same character, so no action needed
@@ -169,29 +171,41 @@ int main(void)
                     else if (Average_data.count < char_space_threshold)
                     {
                         // Character space
-                        
+
                         lcd_clear();
                         lcd_print("CHAR ");
                         // Handle character space
                         if (morseIndex > 0) {
-                            decoded = decodeMorse(morseRoot, morseBuffer, morseIndex);
-                            lcd_put_char(decoded);
-                            morseIndex = 0;
+                            decoded = decodeMorse(morseRoot, morseBuffer, morseIndex);  // tree walk
+                            morseIndex = 0;  // reset to decode new character
+                            if (messageIndex < sizeof(decodedMessage) - 1) {
+                                decodedMessage[messageIndex++] = decoded;
+                                decodedMessage[messageIndex] = '\0';  // null terminate string
+                                lcd_set_cursor(0, 0);
+                                lcd_print(decodedMessage);
+                            }
                         }
                     }
                     else
                     {
                         // Word space
-                        
+
                         lcd_clear();
                         lcd_print("WORD ");
                         // Handle word space
                         if (morseIndex > 0) {
                             decoded = decodeMorse(morseRoot, morseBuffer, morseIndex);
-                            lcd_put_char(decoded);
                             morseIndex = 0;
+                            if (messageIndex < sizeof(decodedMessage) - 1) {
+                                decodedMessage[messageIndex++] = decoded;
+                            }
                         }
-                        lcd_put_char(' ');
+                        if (messageIndex < sizeof(decodedMessage) - 1) {
+                            decodedMessage[messageIndex++] = ' ';  // add space string to buffer for new word
+                        }
+                        decodedMessage[messageIndex] = '\0';
+                        lcd_set_cursor(0, 0);
+                        lcd_print(decodedMessage);
                     }
                 }
 
