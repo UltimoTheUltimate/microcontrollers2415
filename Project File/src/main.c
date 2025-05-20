@@ -37,24 +37,6 @@ Node* morseRoot;
 
 
 
-void lcd_scroll_sample(int value) {
-    static int lcd_pos = 0;
-    char c = value ? '1' : '0';
-
-    // Move cursor to the current position
-    lcd_set_cursor(0, lcd_pos);
-    lcd_put_char(c);
-
-    // Advance position, wrap around if at end of line (assuming 16x2 LCD)
-    lcd_pos++;
-    if (lcd_pos >= 16) {
-        lcd_pos = 0;
-        lcd_set_cursor(0, 0);
-        // Optionally clear the row or overwrite
-    }
-}
-
-
 void sample()
 {
     if (comparator_read())
@@ -62,15 +44,16 @@ void sample()
         leds_set(1, 1, 0);
         sample_ready = 1;   // Set flag to indicate sample is ready
         sampled_value = 1;  // Store the sampled value
-        lcd_scroll_sample(sampled_value);  // Scroll the sampled value on LCD
-        
+        // lcd_scroll_sample(sampled_value);  // Removed LCD scroll
+        // Optionally show sampled value on LCD (optional, can be omitted)
     }
     else
     {
         leds_set(0, 0, 1);
         sample_ready = 1;   // Set flag to indicate sample is ready
         sampled_value = 0;  // Store the sampled value
-        lcd_scroll_sample(sampled_value);  // Scroll the sampled value on LCD
+        // lcd_scroll_sample(sampled_value);  // Removed LCD scroll
+        // Optionally show sampled value on LCD (optional, can be omitted)
     }
 }
 
@@ -81,7 +64,7 @@ int main(void)
     
 
     leds_init();                 // Initialize LEDs
-    timer_init(100000);          // Initialize timer
+    timer_init(2000000);          // Initialize timer
     comparator_init();           // Initialize comparator
     timer_set_callback(sample);  // Set callback function for timer
     timer_enable();              // Start timer
@@ -138,14 +121,18 @@ int main(void)
                     if(Average_data.count > Average_data.avg1)  // Dash
                     {
                         // handle dash
-                        leds_set(1, 0, 0);  // Turn on red LED
+                        
                         morseBuffer[morseIndex++] = 1;
+                        lcd_clear();
+                        lcd_print("DASH ");
                     }
                     else // Dot
                     {
                         // handle dot
-                        leds_set(0, 1, 0);  // Turn on green LED
+                        
                         morseBuffer[morseIndex++] = 0;
+                        lcd_clear();
+                        lcd_print("DOT  ");
                     }
 
                 }
@@ -174,24 +161,30 @@ int main(void)
                     if (Average_data.count < symbol_space_threshold)
                     {
                         // Symbol space
-                        leds_set(0, 0, 1);  // Turn on blue LED (example for symbol space)
+                        
+                        lcd_clear();
+                        lcd_print("SYM ");
                         // Handle symbol space, still in same character, so no action needed
                     }
                     else if (Average_data.count < char_space_threshold)
                     {
                         // Character space
-                        leds_set(1, 1, 0);  // Turn on yellow LED (example for character space)
+                        
+                        lcd_clear();
+                        lcd_print("CHAR ");
                         // Handle character space
                         if (morseIndex > 0) {
                             decoded = decodeMorse(morseRoot, morseBuffer, morseIndex);
-                            lcd_put_char(decoded);  // or printf("%c", decoded);
+                            lcd_put_char(decoded);
                             morseIndex = 0;
                         }
                     }
                     else
                     {
                         // Word space
-                        leds_set(1, 0, 1);  // Turn on purple LED (example for word space)
+                        
+                        lcd_clear();
+                        lcd_print("WORD ");
                         // Handle word space
                         if (morseIndex > 0) {
                             decoded = decodeMorse(morseRoot, morseBuffer, morseIndex);
