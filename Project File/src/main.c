@@ -145,22 +145,11 @@ int main(void)
                         queue_dequeue(&Average_data.queue0lens, &Average_data.value);  // Dequeue if full
                     }
 
-                    Average_data.sum0 = 0;
-                    Average_data.size0 = queue_size(&Average_data.queue0lens);
-                    for (i = 0; i < Average_data.size0; i++)
-                    {
-                        queue_dequeue(&Average_data.queue0lens, &Average_data.value);
-                        Average_data.sum0 += Average_data.value;
-                        queue_enqueue(&Average_data.queue0lens, Average_data.value);  // Re-enqueue the value
-                    }
-                    Average_data.avg0 = Average_data.sum0 / Average_data.size0;  // Calculate the average
-
+        
                     // Define thresholds for spaces
-                    symbol_space_threshold = Average_data.avg0 * 2;  // Example: 2x avg0
-                    char_space_threshold = Average_data.avg0 * 5;    // Example: 5x avg0
 
                     // Classify the space
-                    if (Average_data.count < symbol_space_threshold)
+                    if (Average_data.count < Average_data.avg1)
                     {
                         // Symbol space
 
@@ -168,25 +157,7 @@ int main(void)
                         lcd_print("SYM ");
                         // Handle symbol space, still in same character, so no action needed
                     }
-                    else if (Average_data.count < char_space_threshold)
-                    {
-                        // Character space
-
-                        lcd_clear();
-                        lcd_print("CHAR ");
-                        // Handle character space
-                        if (morseIndex > 0) {
-                            decoded = decodeMorse(morseRoot, morseBuffer, morseIndex);  // tree walk
-                            morseIndex = 0;  // reset to decode new character
-                            if (messageIndex < sizeof(decodedMessage) - 1) {
-                                decodedMessage[messageIndex++] = decoded;
-                                decodedMessage[messageIndex] = '\0';  // null terminate string
-                                lcd_set_cursor(0, 0);
-                                lcd_print(decodedMessage);
-                            }
-                        }
-                    }
-                    else
+                    else if(Average_data.count > (Average_data.avg1*5) )
                     {
                         // Word space
 
@@ -207,6 +178,25 @@ int main(void)
                         lcd_set_cursor(0, 0);
                         lcd_print(decodedMessage);
                     }
+                    else if (Average_data.count > Average_data.avg1 )
+                    {
+                        // Character space
+
+                        lcd_clear();
+                        lcd_print("CHAR ");
+                        // Handle character space
+                        if (morseIndex > 0) {
+                            decoded = decodeMorse(morseRoot, morseBuffer, morseIndex);  // tree walk
+                            morseIndex = 0;  // reset to decode new character
+                            if (messageIndex < sizeof(decodedMessage) - 1) {
+                                decodedMessage[messageIndex++] = decoded;
+                                decodedMessage[messageIndex] = '\0';  // null terminate string
+                                lcd_set_cursor(0, 0);
+                                lcd_print(decodedMessage);
+                            }
+                        }
+                    }
+                    
                 }
 
                 Average_data.previous_value = sampled_value;  // Update previous value
