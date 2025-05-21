@@ -66,13 +66,13 @@ int main(void)
 
 
     leds_init();                 // Initialize LEDs
-    timer_init(2000000);          // Initialize timer
+    timer_init(1500000);          // Initialize timer
     comparator_init();           // Initialize comparator
     timer_set_callback(sample);  // Set callback function for timer
     timer_enable();              // Start timer
     leds_set(0, 0, 0);           // Turn off all LEDs
     lcd_init();                  // Initialize LCD
-    // lcd_clear();          not sure if these are needed
+    lcd_clear();          
     // lcd_set_cursor(0, 0);
 
     // Initialize the queues
@@ -123,18 +123,12 @@ int main(void)
                     if(Average_data.count > Average_data.avg1)  // Dash
                     {
                         // handle dash
-
                         morseBuffer[morseIndex++] = 1;
-                        lcd_clear();
-                        lcd_print("DASH ");
                     }
                     else // Dot
                     {
                         // handle dot
-
                         morseBuffer[morseIndex++] = 0;
-                        lcd_clear();
-                        lcd_print("DOT  ");
                     }
 
                 }
@@ -152,17 +146,11 @@ int main(void)
                     if (Average_data.count < Average_data.avg1)
                     {
                         // Symbol space
-
-                        lcd_clear();
-                        lcd_print("SYM ");
                         // Handle symbol space, still in same character, so no action needed
                     }
-                    else if(Average_data.count > (Average_data.avg1*5) )
+                    else if(Average_data.count > (Average_data.avg1*3) )
                     {
                         // Word space
-
-                        lcd_clear();
-                        lcd_print("WORD ");
                         // Handle word space
                         if (morseIndex > 0) {
                             decoded = decodeMorse(morseRoot, morseBuffer, morseIndex);
@@ -181,9 +169,6 @@ int main(void)
                     else if (Average_data.count > Average_data.avg1 )
                     {
                         // Character space
-
-                        lcd_clear();
-                        lcd_print("CHAR ");
                         // Handle character space
                         if (morseIndex > 0) {
                             decoded = decodeMorse(morseRoot, morseBuffer, morseIndex);  // tree walk
