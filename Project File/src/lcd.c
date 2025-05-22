@@ -168,6 +168,8 @@ void lcd_write_cmd(uint8_t c) {
 
 // *** Exported functions ***
 
+#define LCD_WIDTH 16
+
 // Initialises the LCD module.
 void lcd_init(void) {
     // Set up serial-parallel interface
@@ -211,29 +213,55 @@ void lcd_put_char(char c) {
     lcd_write_data(c);
 }
 
+void lcd_scroll_char(char c) {
+    static char line[LCD_WIDTH + 1];
+    static int pos = 0;
+    int i;
+    // Add new character to buffer
+    if (pos < LCD_WIDTH) {
+        line[pos++] = c;
+        line[pos] = '\0';
+    } else {
+        // Shift left and add new character at the end
+        for (i = 0; i < LCD_WIDTH - 1; i++) {
+            line[i] = line[i + 1];
+        }
+        line[LCD_WIDTH - 1] = c;
+        line[LCD_WIDTH] = '\0';
+    }
+    // Print the buffer to the top row
+    lcd_set_cursor(0, 0);
+    for (i = 0; i < LCD_WIDTH; i++) {
+        if (line[i] != '\0')
+            lcd_put_char(line[i]);
+        else
+            lcd_put_char(' ');
+    }
+}
+
+
 // Prints the null terminated string to the LCD and increments the cursor.
 void lcd_print(char *string) {
-    int length = 0;
+    int len = 0;
+    int i, j;
     char *s = string;
     while (*s++){
         len++;
     }
     if(len <= LCD_WIDTH){
-    while(*string) {
-        lcd_put_char(*string++);
-    }
-    }
-    else {
-        for (int i =0; i <= len - 16; i++){
-            lcd_set_cursor(0,0);
-            for (int j=0; j < 16; j++){
-                lcd_put_char(string[i+j]);
-
-            }
-            delay_ms(100)
+        while(*string) {
+            lcd_put_char(*string++);
         }
     }
-    
+    else {
+        for (i = 0; i <= len - LCD_WIDTH; i++){
+            lcd_set_cursor(0,0);
+            for (j = 0; j < LCD_WIDTH; j++){
+                lcd_put_char(string[i+j]);
+            }
+            delay_ms(100);
+        }
+    }
 }
 
 // *******************************ARM University Program Copyright © ARM Ltd 2014*************************************

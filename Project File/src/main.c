@@ -6,7 +6,8 @@
 #include "squeue.h"
 #include "MorseTree.h"
 
-#define QUEUE_SIZE 10  // Define the size of the queues
+#define QUEUE_SIZE 20  // less than 20 may increase chance of errors due to average drift
+#define SAMPLE_QUEUE_SIZE 32
 
 struct average_data
 {
@@ -26,39 +27,59 @@ struct average_data
 volatile int sample_ready = 0;   // Flag to indicate if a sample is ready
 volatile int sampled_value = 0;  // Variable to store the sampled value
 
-
 Node* morseRoot;
 int morseBuffer[10];  // Morse buffer, adjustable
 int morseIndex = 0;
 char decodedMessage[100] = {0};  // string buffer, adjustable
+char lastDisplayedMessage[100] = {0};
 int messageIndex = 0;
 int symbol_space_threshold;
 int char_space_threshold;
 char decoded;
 int i;
 
+int sampleQueue[SAMPLE_QUEUE_SIZE];
+int sampleQueueHead = 0;
+int sampleQueueTail = 0;
 
+// Enqueue function for sample queue
+int enqueue_sample(int value) {
+    int nextHead = (sampleQueueHead + 1) % SAMPLE_QUEUE_SIZE;
+    if (nextHead == sampleQueueTail) {
+        // Queue full, drop sample or handle overflow
+        return 0;
+    }
+    sampleQueue[sampleQueueHead] = value;
+    sampleQueueHead = nextHead;
+    return 1;
+}
+
+// Dequeue function for sample queue
+int dequeue_sample(int *value) {
+    if (sampleQueueHead == sampleQueueTail) {
+        // Queue empty
+        return 0;
+    }
+    *value = sampleQueue[sampleQueueTail];
+    sampleQueueTail = (sampleQueueTail + 1) % SAMPLE_QUEUE_SIZE;
+    return 1;
+}
 
 void sample()
 {
-    if (comparator_read())
-    {
-        leds_set(1, 1, 0);
-        sample_ready = 1;   // Set flag to indicate sample is ready
-        sampled_value = 1;  // Store the sampled value
-        // lcd_scroll_sample(sampled_value);  // Removed LCD scroll
-        // Optionally show sampled value on LCD (optional, can be omitted)
-    }
-    else
-    {
-        leds_set(0, 0, 1);
-        sample_ready = 1;   // Set flag to indicate sample is ready
-        sampled_value = 0;  // Store the sampled value
-        // lcd_scroll_sample(sampled_value);  // Removed LCD scroll
-        // Optionally show sampled value on LCD (optional, can be omitted)
-    }
+    int value = comparator_read() ? 1 : 0;
+    enqueue_sample(value);
 }
 
+// Helper function for string comparison (C89, no strcmp)
+int str_equal(const char *a, const char *b) {
+    while (*a && *b) {
+        if (*a != *b) return 0;
+        a++;
+        b++;
+    }
+    return (*a == *b);
+}
 
 int main(void)
 {
@@ -66,7 +87,7 @@ int main(void)
 
 
     leds_init();                 // Initialize LEDs
-    timer_init(1500000);          // Initialize timer
+    timer_init(300000);          // Initialize timer
     comparator_init();           // Initialize comparator
     timer_set_callback(sample);  // Set callback function for timer
     timer_enable();              // Start timer
@@ -84,18 +105,15 @@ int main(void)
 
     while (1)
     {
-        if (sample_ready)
+        int has_sample = 0;
+        int current_sample = 0;
+        has_sample = dequeue_sample(&current_sample);
+        if (has_sample)
         {
-            sample_ready = 0;  // Reset flag
-            if (sampled_value)
-            {
-                leds_set(1, 0, 0);  // Turn on red LED
-            }
-            else
-            {
-                leds_set(0, 1, 0);  // Turn on green LED
-            }
-
+            leds_set(1, 1, 0); // Sample ready: yellow (red + green)
+            sampled_value = current_sample;
+            // Remove sample_ready logic, process every dequeued sample
+            // ...existing code for processing a sample...
             if (sampled_value == Average_data.previous_value)
             {
                 Average_data.count++;  // Increment count
@@ -123,12 +141,22 @@ int main(void)
                     if(Average_data.count > Average_data.avg1)  // Dash
                     {
                         // handle dash
-                        morseBuffer[morseIndex++] = 1;
+                        if (morseIndex < sizeof(morseBuffer)/sizeof(morseBuffer[0])) {
+                            morseBuffer[morseIndex++] = 1;
+                    } else {
+                        // Optionally reset or handle overflow
+                        morseIndex = 0;
+                    }
                     }
                     else // Dot
                     {
                         // handle dot
-                        morseBuffer[morseIndex++] = 0;
+                        if (morseIndex < sizeof(morseBuffer)/sizeof(morseBuffer[0])) {
+                            morseBuffer[morseIndex++] = 0;
+                    } else {
+                        // Optionally reset or handle overflow
+                        morseIndex = 0;
+                    }
                     }
 
                 }
@@ -139,7 +167,7 @@ int main(void)
                         queue_dequeue(&Average_data.queue0lens, &Average_data.value);  // Dequeue if full
                     }
 
-        
+    
                     // Define thresholds for spaces
 
                     // Classify the space
@@ -155,16 +183,12 @@ int main(void)
                         if (morseIndex > 0) {
                             decoded = decodeMorse(morseRoot, morseBuffer, morseIndex);
                             morseIndex = 0;
-                            if (messageIndex < sizeof(decodedMessage) - 1) {
-                                decodedMessage[messageIndex++] = decoded;
-                            }
+                            lcd_scroll_char(decoded);
+                            lcd_scroll_char(' ');  // Add space after the character
                         }
-                        if (messageIndex < sizeof(decodedMessage) - 1) {
-                            decodedMessage[messageIndex++] = ' ';  // add space string to buffer for new word
-                        }
-                        decodedMessage[messageIndex] = '\0';
-                        lcd_set_cursor(0, 0);
-                        lcd_print(decodedMessage);
+                        // Optionally print a space after a word
+                        // lcd_set_cursor(0, 0);
+                        // lcd_put_char(' ');
                     }
                     else if (Average_data.count > Average_data.avg1 )
                     {
@@ -173,12 +197,7 @@ int main(void)
                         if (morseIndex > 0) {
                             decoded = decodeMorse(morseRoot, morseBuffer, morseIndex);  // tree walk
                             morseIndex = 0;  // reset to decode new character
-                            if (messageIndex < sizeof(decodedMessage) - 1) {
-                                decodedMessage[messageIndex++] = decoded;
-                                decodedMessage[messageIndex] = '\0';  // null terminate string
-                                lcd_set_cursor(0, 0);
-                                lcd_print(decodedMessage);
-                            }
+                            lcd_scroll_char(decoded);
                         }
                     }
                     
@@ -188,6 +207,11 @@ int main(void)
                 Average_data.count = 1;                       // Reset count
             }
         }
+        else
+        {
+            leds_set(0, 0, 0); // Sample not ready: blue
+        }
+        //else                 leds_set(1, 0, 0);  // Turn on green LED;
     }
 
     return 0;

@@ -40,4 +40,9 @@ void lcd_put_char(char c);
  */
 void lcd_set_cursor_visibile(int visible);
 
+/*! \brief Scrolls a character on the top row of the LCD, shifting left when full.
+ *  \param c  Character to be scrolled.
+ */
+void lcd_scroll_char(char c);
+
 #endif // LDC_H

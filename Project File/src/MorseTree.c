@@ -192,15 +192,15 @@ char decodeMorse(Node* root, const int* morse, int length) {
     int i; // declaration moved to top
     for (i = 0; i < length; i++) {
         if (morse[i] == 0) {
-            if (current->dot == NULL_PTR) return '?';
+            if (current->dot == NULL_PTR) return '^';
             current = current->dot;
         } else if (morse[i] == 1) {
-            if (current->dash == NULL_PTR) return '?';
+            if (current->dash == NULL_PTR) return '^';
             current = current->dash;
         } else {
             // Invalid input: only 0 or 1 allowed
-            return '?';
+            return '^';
         }
     }
-    return (current && current->letter != '\0') ? current->letter : '?';
+    return (current && current->letter != '\0') ? current->letter : '^';
 }
