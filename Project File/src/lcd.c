@@ -213,9 +213,27 @@ void lcd_put_char(char c) {
 
 // Prints the null terminated string to the LCD and increments the cursor.
 void lcd_print(char *string) {
+    int length = 0;
+    char *s = string;
+    while (*s++){
+        len++;
+    }
+    if(len <= LCD_WIDTH){
     while(*string) {
         lcd_put_char(*string++);
     }
+    }
+    else {
+        for (int i =0; i <= len - 16; i++){
+            lcd_set_cursor(0,0);
+            for (int j=0; j < 16; j++){
+                lcd_put_char(string[i+j]);
+
+            }
+            delay_ms(100)
+        }
+    }
+    
 }
 
 // *******************************ARM University Program Copyright © ARM Ltd 2014*************************************
