@@ -9,20 +9,13 @@
 #define QUEUE_SIZE 20  // less than 20 may increase chance of errors due to average drift
 #define SAMPLE_QUEUE_SIZE 32
 
-struct average_data
-{
-    int avg1;
-    int avg0;
-    int count;
-    int previous_value;
-    int sum1;   // Sum for queue1lens
-    int sum0;   // Sum for queue0lens
-    int value;  // Temporary value for dequeuing
-    int size1;  // Size of queue1lens
-    int size0;  // Size of queue0lens
-    Queue queue0lens;
-    Queue queue1lens;
-} Average_data;
+int avg1;
+int count;
+int previous_value;
+int sum1;   // Sum for queue1lens
+int value;  // Temporary value for dequeuing
+int size1;  // Size of queue1lens
+Queue queue1lens;
 
 volatile int sample_ready = 0;   // Flag to indicate if a sample is ready
 volatile int sampled_value = 0;  // Variable to store the sampled value
@@ -30,11 +23,6 @@ volatile int sampled_value = 0;  // Variable to store the sampled value
 Node* morseRoot;
 int morseBuffer[10];  // Morse buffer, adjustable
 int morseIndex = 0;
-char decodedMessage[100] = {0};  // string buffer, adjustable
-char lastDisplayedMessage[100] = {0};
-int messageIndex = 0;
-int symbol_space_threshold;
-int char_space_threshold;
 char decoded;
 int i;
 
@@ -71,23 +59,13 @@ void sample()
     enqueue_sample(value);
 }
 
-// Helper function for string comparison (C89, no strcmp)
-int str_equal(const char *a, const char *b) {
-    while (*a && *b) {
-        if (*a != *b) return 0;
-        a++;
-        b++;
-    }
-    return (*a == *b);
-}
-
 int main(void)
 {
-    // Variable declarations moved to the top
+    
 
 
     leds_init();                 // Initialize LEDs
-    timer_init(300000);          // Initialize timer
+    timer_init(250000);          // Initialize timer
     comparator_init();           // Initialize comparator
     timer_set_callback(sample);  // Set callback function for timer
     timer_enable();              // Start timer
@@ -96,9 +74,8 @@ int main(void)
     lcd_clear();          
     // lcd_set_cursor(0, 0);
 
-    // Initialize the queues
-    queue_init(&Average_data.queue0lens, QUEUE_SIZE);
-    queue_init(&Average_data.queue1lens, QUEUE_SIZE);
+   
+    queue_init(&queue1lens, QUEUE_SIZE);
 
     // Initialize Morse tree
     morseRoot = buildMorseTree();
@@ -110,106 +87,97 @@ int main(void)
         has_sample = dequeue_sample(&current_sample);
         if (has_sample)
         {
-            leds_set(1, 1, 0); // Sample ready: yellow (red + green)
+            if (current_sample) {
+                leds_set(1, 0, 0); // Green for 1 detected
+            } else {
+                leds_set(0, 1, 0); // Red for 0 detected
+            }// I have been bashing my head on this for half an hour here... Why do the conditions for this have to be reversed for red and green to be shown at 1 or 0??? 
             sampled_value = current_sample;
-            // Remove sample_ready logic, process every dequeued sample
-            // ...existing code for processing a sample...
-            if (sampled_value == Average_data.previous_value)
+            if (sampled_value == previous_value)
             {
-                Average_data.count++;  // Increment count
+                count++;  
             }
             else
             {
-                // Store the count in the appropriate queue
+                
                 if (sampled_value)
                 {
-                    if (!queue_enqueue(&Average_data.queue1lens, Average_data.count))
+                    if (!queue_enqueue(&queue1lens, count))
                     {
-                        queue_dequeue(&Average_data.queue1lens, &Average_data.value);  // Dequeue if full
+                        queue_dequeue(&queue1lens, &value);  // Dequeue if full
                     }
 
-                    Average_data.sum1 = 0;
-                    Average_data.size1 = queue_size(&Average_data.queue1lens);
-                    for (i = 0; i < Average_data.size1; i++)
+                    sum1 = 0;
+                    size1 = queue_size(&queue1lens);
+                    for (i = 0; i < size1; i++)
                     {
-                        queue_dequeue(&Average_data.queue1lens, &Average_data.value);
-                        Average_data.sum1 += Average_data.value;
-                        queue_enqueue(&Average_data.queue1lens, Average_data.value);  // Re-enqueue the value
+                        queue_dequeue(&queue1lens, &value);
+                        sum1 += value;
+                        queue_enqueue(&queue1lens, value);  // Re-enqueue the value
                     }
-                    Average_data.avg1 = Average_data.sum1 / Average_data.size1;  // Calculate the average
+                    avg1 = sum1 / size1;  // Calculate the average
 
-                    if(Average_data.count > Average_data.avg1)  // Dash
+                    if(count > avg1)  // Dash
                     {
                         // handle dash
                         if (morseIndex < sizeof(morseBuffer)/sizeof(morseBuffer[0])) {
                             morseBuffer[morseIndex++] = 1;
-                    } else {
-                        // Optionally reset or handle overflow
-                        morseIndex = 0;
-                    }
+                        } else {
+                            // Optionally reset or handle overflow
+                            morseIndex = 0;
+                        }
                     }
                     else // Dot
                     {
                         // handle dot
                         if (morseIndex < sizeof(morseBuffer)/sizeof(morseBuffer[0])) {
                             morseBuffer[morseIndex++] = 0;
-                    } else {
-                        // Optionally reset or handle overflow
-                        morseIndex = 0;
-                    }
+                        } else {
+                            // Optionally reset or handle overflow
+                            morseIndex = 0;
+                        }
                     }
 
                 }
                 else
                 {
-                    if (!queue_enqueue(&Average_data.queue0lens, Average_data.count))
-                    {
-                        queue_dequeue(&Average_data.queue0lens, &Average_data.value);  // Dequeue if full
-                    }
-
-    
-                    // Define thresholds for spaces
-
-                    // Classify the space
-                    if (Average_data.count < Average_data.avg1)
-                    {
-                        // Symbol space
-                        // Handle symbol space, still in same character, so no action needed
-                    }
-                    else if(Average_data.count > (Average_data.avg1*3) )
-                    {
-                        // Word space
-                        // Handle word space
-                        if (morseIndex > 0) {
-                            decoded = decodeMorse(morseRoot, morseBuffer, morseIndex);
-                            morseIndex = 0;
-                            lcd_scroll_char(decoded);
-                            lcd_scroll_char(' ');  // Add space after the character
-                        }
-                        // Optionally print a space after a word
-                        // lcd_set_cursor(0, 0);
-                        // lcd_put_char(' ');
-                    }
-                    else if (Average_data.count > Average_data.avg1 )
-                    {
-                        // Character space
-                        // Handle character space
-                        if (morseIndex > 0) {
-                            decoded = decodeMorse(morseRoot, morseBuffer, morseIndex);  // tree walk
-                            morseIndex = 0;  // reset to decode new character
-                            lcd_scroll_char(decoded);
-                        }
-                    }
                     
+                    
+                    if(count > (avg1*3))
+                    {
+                        
+                            if (morseIndex > 0) {
+                                decoded = decodeMorse(morseRoot, morseBuffer, morseIndex);
+                                morseIndex = 0;
+                                lcd_scroll_char(decoded);
+                                lcd_scroll_char(' ');  // Add space after the character
+                            }
+                        
+                    }
+                    else if (count > avg1)
+                    {
+                        
+                        // Character space
+                        if (morseIndex > 0) {
+                            decoded = decodeMorse(morseRoot, morseBuffer, morseIndex);  
+                            morseIndex = 0;  
+                            lcd_scroll_char(decoded);
+                        }
+                    }
+                    else
+                    {
+                        
+                        
+                    }
                 }
 
-                Average_data.previous_value = sampled_value;  // Update previous value
-                Average_data.count = 1;                       // Reset count
+                previous_value = sampled_value;  // Update previous value
+                count = 1;                       // Reset count
             }
         }
         else
         {
-            leds_set(0, 0, 0); // Sample not ready: blue
+            
         }
         //else                 leds_set(1, 0, 0);  // Turn on green LED;
     }

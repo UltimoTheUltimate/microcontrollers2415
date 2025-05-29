@@ -213,7 +213,7 @@ void lcd_put_char(char c) {
     lcd_write_data(c);
 }
 
-void lcd_scroll_char(char c) {
+void lcd_scroll_char(char c) { // main character scrolling function
     static char line[LCD_WIDTH + 1];
     static int pos = 0;
     int i;
@@ -240,7 +240,7 @@ void lcd_scroll_char(char c) {
 }
 
 
-// Prints the null terminated string to the LCD and increments the cursor.
+// Prints the null terminated string to the LCD and increments the cursor. (modified to scroll if too long) DO NOT USE, VERY SLOW
 void lcd_print(char *string) {
     int len = 0;
     int i, j;
