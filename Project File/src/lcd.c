@@ -170,6 +170,18 @@ void lcd_write_cmd(uint8_t c) {
 
 #define LCD_WIDTH 16
 
+// Internal buffer and position for lcd_scroll_char
+static char scroll_line[LCD_WIDTH + 1];
+static int scroll_pos = 0;
+
+// Resets the lcd_scroll_char buffer and position
+void lcd_scroll_reset(void) {
+    int i;
+    for (i = 0; i < LCD_WIDTH + 1; i++)
+        scroll_line[i] = '\0';
+    scroll_pos = 0;
+}
+
 // Initialises the LCD module.
 void lcd_init(void) {
     // Set up serial-parallel interface
@@ -206,6 +218,7 @@ void lcd_set_cursor(int column, int row) {
 void lcd_clear(void) {
     lcd_write_cmd(0x01);
     delay_us(1520);
+    lcd_scroll_reset(); // Reset scroll buffer when LCD is cleared
 }
 
 // Prints the specified character to the LCD and increments the cursor.
@@ -214,26 +227,24 @@ void lcd_put_char(char c) {
 }
 
 void lcd_scroll_char(char c) { // main character scrolling function
-    static char line[LCD_WIDTH + 1];
-    static int pos = 0;
     int i;
     // Add new character to buffer
-    if (pos < LCD_WIDTH) {
-        line[pos++] = c;
-        line[pos] = '\0';
+    if (scroll_pos < LCD_WIDTH) {
+        scroll_line[scroll_pos++] = c;
+        scroll_line[scroll_pos] = '\0';
     } else {
         // Shift left and add new character at the end
         for (i = 0; i < LCD_WIDTH - 1; i++) {
-            line[i] = line[i + 1];
+            scroll_line[i] = scroll_line[i + 1];
         }
-        line[LCD_WIDTH - 1] = c;
-        line[LCD_WIDTH] = '\0';
+        scroll_line[LCD_WIDTH - 1] = c;
+        scroll_line[LCD_WIDTH] = '\0';
     }
     // Print the buffer to the top row
     lcd_set_cursor(0, 0);
     for (i = 0; i < LCD_WIDTH; i++) {
-        if (line[i] != '\0')
-            lcd_put_char(line[i]);
+        if (scroll_line[i] != '\0')
+            lcd_put_char(scroll_line[i]);
         else
             lcd_put_char(' ');
     }

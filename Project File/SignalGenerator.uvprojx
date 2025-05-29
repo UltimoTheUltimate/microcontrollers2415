@@ -519,6 +519,16 @@
               <FileType>5</FileType>
               <FilePath>.\src\MorseTree.h</FilePath>
             </File>
+            <File>
+              <FileName>switches.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\switches.h</FilePath>
+            </File>
+            <File>
+              <FileName>switches.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\switches.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

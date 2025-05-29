@@ -5,6 +5,7 @@
 #include "lcd.h"
 #include "squeue.h"
 #include "MorseTree.h"
+#include "switches.h"
 
 #define QUEUE_SIZE 20  // less than 20 may increase chance of errors due to average drift
 #define SAMPLE_QUEUE_SIZE 32
@@ -15,6 +16,8 @@ int previous_value;
 int sum1;   // Sum for queue1lens
 int value;  // Temporary value for dequeuing
 int size1;  // Size of queue1lens
+int has_sample = 0;
+int current_sample = 0;
 Queue queue1lens;
 
 volatile int sample_ready = 0;   // Flag to indicate if a sample is ready
@@ -61,9 +64,6 @@ void sample()
 
 int main(void)
 {
-    
-
-
     leds_init();                 // Initialize LEDs
     timer_init(250000);          // Initialize timer
     comparator_init();           // Initialize comparator
@@ -74,16 +74,21 @@ int main(void)
     lcd_clear();          
     // lcd_set_cursor(0, 0);
 
+    switches_init(); // Initialize switches
    
     queue_init(&queue1lens, QUEUE_SIZE);
 
     // Initialize Morse tree
     morseRoot = buildMorseTree();
 
+  
+
     while (1)
     {
-        int has_sample = 0;
-        int current_sample = 0;
+        // Check if center switch is pressed, clear LCD if so
+        if (switch_get(P_SW_CR)) {
+            lcd_clear();
+        }
         has_sample = dequeue_sample(&current_sample);
         if (has_sample)
         {
