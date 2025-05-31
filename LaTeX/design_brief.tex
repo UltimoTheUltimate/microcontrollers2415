@@ -2,7 +2,7 @@
 \svnInfo $Id$
 
 % Document details
-\title{Design Brief: Group 5}
+\title{Design Document: Group 5}
 \author{Akram Sharara, Antoni Marek Skoć, Daniel Agius}
 \date{31 May 2025}
 
@@ -17,7 +17,7 @@ As a record of the development of the Morse code receiver, this design document 
 The objective of this assignment was to design and implement a microcontroller-based system that receives an input Amplitude Shift Keyed (ASK) Morse code signal, translates it into characters, and displays it on an LCD. Additionally, our implementation of the Morse code translator took into consideration the possible presence of noise in the signal, as well as adapting to different transmission speeds. All code was written in C, and any code used from [2] was adjusted to remove dependencies and external libraries, in addition to adding functionality where necessary. The design plan followed the outline shown in Figure 1.
 
 % Figure 1: General diagram
-\begin{figure}[h]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.4\textwidth]{images/designdiag.png}
     \caption{Morse Code Reciever Block Diagram.}
@@ -31,7 +31,7 @@ When it comes to Morse code, the input is a form of On-Off keying, which switche
 Demodulation of this to digital is very simple, and as we are working with a binary input, the demodulated waveform does not need to be perfectly coherent. A circuit diagram can be found below:
 
 % Circuit diagram
-\begin{figure}[h]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.4\textwidth]{images/circuit.png}
     \caption{Circuit diagram for OOK demodulation.}
@@ -52,7 +52,7 @@ To sample this digital input, timers were used. This is to ensure that there is 
 Using this stream of binary samples, we can now convert the lengths of high or low periods into dashes, dots, symbol spaces, character spaces, and word spaces. To do this, every iteration of the main loop did what can be seen in figure \ref{FSM}.
 
 % FSM diagram
-\begin{figure}[h]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.4\textwidth]{images/fsm.png}
     \caption{Finite State Machine (FSM) for Morse code decoding.}
@@ -63,7 +63,7 @@ Using this stream of binary samples, we can now convert the lengths of high or l
 Due to the binary nature of Morse code, it allows the use of a binary tree structure where each node is reachable through a dot or a dash. As seen in [1], it is intuitive that a tree of characters that are reachable using dot and dash traversals would allow for fast lookup and efficient memory usage due to the compact nature of characters, which are stored as 8 bit integers. A comprehensive binary tree that includes all necessary symbols is shown in figure 3.
 
 % Morse code binary tree
-\begin{figure}[h]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.4\textwidth]{images/morse_tree.png}
     \caption{Morse code binary tree.}
@@ -106,7 +106,7 @@ Random sporadic characters.
 In almost all cases, there was no error in the output even up to 270WPM. Below are some images of the outputs.
 
 % Test output (PARIS)
-\begin{figure}[h]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.4\textwidth]{images/testparis.png}
     \caption{LCD output for test string ``PARIS'' at 50WPM.}
@@ -114,7 +114,7 @@ In almost all cases, there was no error in the output even up to 270WPM. Below a
 \end{figure}
 
 % Test output (Alphabet)
-\begin{figure}[h]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.4\textwidth]{images/testalfabet.png}
     \caption{LCD output for test string ``ABCDEFGHIJKLMNOPQRSTUVWXYZ'' at 50WPM.}
