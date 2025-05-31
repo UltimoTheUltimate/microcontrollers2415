@@ -1,0 +1,146 @@
+RED = OLD (from design brief submission)
+GREEN = AKRAM
+
+Design Document: Group 5
+Authors: Akram Sharara, Antoni Marek Skoć, Daniel Agius
+
+Abstract
+
+As a record of the development of the Morse code receiver, this design document provides an outline of the aims and objectives of the project as set out in the handbook and how they were realized. It discusses a comprehensive view of the development stages of the receiver using figures \ref{generaldiag},\ref{FSM}, and how signal sampling will be handled to convert analog audio inputs to digital ones. A working implementation was finalized in May based on the FSM in fig. 2, with noise handling capabilities and the ability to decode inputs at various transmission speeds, up to even 270 WPM. The receiver can handle inputs with inaccurate timings thanks to an average-based threshold decoding. An LED was used as a digital output to indicate whether the input signal is 1 or 0. A Morse binary tree is used to decode the input, and the input is displayed using a tailor-made function that allows for scrollability for long strings. Testing was done before modification to meet additional requirements as set out in the handbook.
+
+Introduction
+
+The objective of this assignment was to design and implement a microcontroller-based system that receives an input Amplitude Shift Keyed (ASK) Morse code signal, translates it into characters, and displays it on an LCD. Additionally, our implementation of the Morse code translator took into consideration the possible presence of noise in the signal, as well as adapting to different transmission speeds. All code was written in C, and any code used from [2] was adjusted to remove dependencies and external libraries, in addition to adding functionality where necessary. The design plan followed the outline shown in Figure 1. 
+
+
+Figure 1, a diagram outlining the development of the Morse code receiver.
+Signal Demodulation
+When it comes to Morse code, the input is a form of On-Off keying, which switches on and off an oscillator depending on whether there is a binary high or low. Effectively, this is an application of the Double-Sideband Suppressed Carrier (DSB-SC) modulation scheme.
+
+Demodulation of this to digital is very simple, and as we are working with a binary input, the demodulated waveform does not need to be perfectly coherent. A circuit diagram can be found below:
+
+The above circuit, found in figure \ref{whateverthehecktherefis} has the following stages:
+
+\begin{itemise}
+\item An inverting amplifier opamp stage biased to double the amplification of the signal and limiting the voltage between $0V$ and $+3.3V$
+\item a diode for rectification (can be replaced with a full-bridge rectifier if you use diodes that have a reasonable voltage drop)
+\item A Resistor and Capacitor in parallel with values of $20k\Omega$ and $100nF$, respectively
+\end{itemise}
+
+Below in figure \ref{OSCpic} is the output of the circuit at point A on an oscilloscope when given an on-off keyed signal at approximately 25Hz.
+
+While the image in figure \ref{oscpic} shows the output when using 600Hz as a carrier, the circuit worked with tones as low as 300Hz (which may affect maximum words per minute) and as high as 1.3kHz. In case you need to work with higher frequencies, the values of the circuit can be changed to produce a higher amplitude square wave at that frequency.
+
+A comparator is used as the conversion stage from analog to digital. This compares the voltage at point A in the circuit with the voltage coming from the potentiometer output on the microcontroller development board. Depending on which voltage is larger, you get a high or low digital input. An issue with this circuit is that if the on-off keyed signal has a long slew rate, it may falsely trigger briefly.
+
+This approach has a very impressive noise handling capability, especially Gaussian noise, to the point where it could handle a signal-to-noise ratio of around 50%, and likely more, as we could not test at larger amounts of noise. To handle the noise, the potentiometer needs to be tuned to produce a threshold voltage that blocks the noise but allows the original binary signal.
+Sampling
+To sample this digital input, timers were used. This is to ensure that there is an equal $\Delta t$ between each sample, otherwise, there may be inaccuracies. To implement this, a timer was set to run every $250kHz$ [2], with the callback function set to be the comparator sample function. To allow much higher sample rates, a queue was added to act as a buffer between the sampling and processing parts. This allowed sample rates to be pushed higher. A queue size of 32 was found to be perfect. Any less would lead to dropped samples at high WPM, and any more would significantly affect system performance. An LED is used to interpret the sampled value as being high or low (green or red). This is very useful when tuning out noise.
+Binary Signal Interpretation
+Using this stream of binary samples, we can now convert the lengths of high or low periods into dashes, dots, symbol spaces, character spaces, and word spaces. To do this, every iteration of the main loop did what can be seen in figure \ref{FSM}
+
+
+
+
+
+In figure \ref{FSM}, the length is a count of the number of times the sample was the same (i.e., 0000 would result in a count of 4).
+
+To calculate the average, a queue of previous lengths is used. For the case of simplicity, and to avoid a case of mishandling pauses as very large lengths, the average is only computed between the lengths of the high signals (dash and dot). 
+
+Using the average, we can then compute the 5 Morse code tokens (dash, dot, symbol space, character space, and word space).
+
+This approach should have a very large margin of error in the case where a human operator keys in a Morse-code signal. It also has the benefit that it can easily adapt to changing transmission speeds. 
+
+Without tweaking any parameters, the code can go from 1 WPM to 300 WPM, to 50 WPM, to 20 WPM by simply resetting the microcontroller, which resets the average values. Theoretically, over 20 dashes or dots, the microcontroller can slowly adapt to an abrupt and unexpected change of word speed, but this will result in many invalid characters. Testing was done with 50 WPM as the standard transmission speed.
+
+The drawback of this approach is that until the average is established, the first few characters will be invalid, as a dash would be treated as a dot, but if standard transmission protocols for Morse code are followed, where -.-.- is sent, denoting a starting signal, this would not be an issue.
+ 
+
+Morse Code Translation
+
+Due to the binary nature of Morse code, it allows the use of a binary tree structure where each node is reachable through a dot or a dash. As seen in [1], it is intuitive that a tree of characters that are reachable using dot and dash traversals would allow for fast lookup and efficient memory usage due to the compact nature of characters, which are stored as 8 bit integers. A comprehensive binary tree that includes all necessary symbols is shown in figure 3.
+
+
+
+Fig. 3, A diagram of a simplified Morse code binary tree, where a left edge is a dot and a right edge is a dash.
+
+Our implementation extends this tree to include traversals to nodes that map to all characters or signals in [1]. The tree begins in a stable start state, then as it receives either a dot or a dash, it traverses down by a depth of 1, reaching either “E” (.) or “T” (-), and continues throughout. Therefore, a consecutive sequence of 5 dots (.....) would map to “5” in Morse code, the leftmost node, whereas 5 consecutive dashes (-----) would map to “0” in Morse code, the rightmost node. This implementation allows for fast lookup because traversing a binary tree takes place in O(n) time, where n is the number of steps along a guided walk across the tree based on a Morse code sequence for a given character.
+
+As for the code implementation, the tree is designed using sequences (arrays) of ones and zeroes, where 0 is a dot and 1 is a dash. This would mean that an array of 5 zeroes ({0,0,0,0,0}) would map to “5”, and an array of 5 ones would be represented as ({1,1,1,1,1}), mapping to the character “0”. To insert nodes into a tree, insertMorse is called, taking a root, a sequence of ones and zeroes, its associated length, and the character associated with this Morse sequence as parameters. For a given sequence, it starts from the root of the tree and iteratively adds leaf nodes if they are not already created. If for a dot, there is no left child node, it is created, and the same is done for a right child in the event of a dash. The associated character is assigned to the final node. This function is vital for buildMorseTree, which builds the Morse tree based on the assignment specifications by calling insertMorse for all valid sequences of dots and dashes. The LPC4088 has 128 kB in SRAM, which is where the function calls and Morse tree, itself, will be stored. The microcontroller also has 512 kB of flash memory, and the tree logic uses a few kilobytes at most, so memory use was not an issue.
+
+To decode Morse sequences, decodeMorse iteratively initiates a walk through the tree from the root based on the sequence of dots (0) and dashes (1), returning the associated letter at the final node for valid sequences and an error otherwise, signaled by ‘^’ which is the same character for 8 dot transmissions depicting an error.
+
+The full implementation can reach any character in at most 6 steps, with one 8-step node that denotes an error. This compact design allows for a conservative use of the embedded systems' resources, freeing them up for more intensive efforts like analog-to-digital conversion, sampling, and output display. In total, the tree includes:
+
+2 one-symbol characters (“E” and “T”)
+4 two-symbol characters
+8 three-symbol characters
+12 four-symbol characters
+17 five-symbol characters
+6 six-symbol characters
+1 eight-symbol character (8 dots denoting error)
+
+LCD Display
+
+To display the translated Morse signal on the LCD, predefined functions in C files from [2] are employed with adjustments and additions to engage with the functional and technical requirements of the receiver. In the case of “lcd.c” and “lcd.h,” adjustments were added to add scrolling functionality, notably in the form of a lcd_scroll_char function. This function relies on a scroll buffer for displaying the previous characters. The function checks if the output is too long to be fully displayed on the LCD’s top line, and scrolls to the left if so, making more space for the overflowing characters. This is done by checking if the number of stored characters exceeds the LCD width. If there is still room, the character is simply appended to the end, and a scroll buffer index is incremented. Once the screen real estate has been exhausted, a loop shifts all stored characters to the left to make space for the most recent one.
+
+To fully display this output, lcd_scroll_char sets the cursor to the top left, and another loop iterates through the string buffer and outputs the sequence of characters using lcd_put_char on each element until the null terminator, filling the rest of the line with spaces if the scroll buffer is shorter than the screen.
+
+Merging Tree and LCD Functionality
+
+To merge the tree-based decoding and the functionality in the modified “lcd.c” file, header files are included in “main.c” to use vital functions such as decodeMorse and lcd_scroll_char. The main function code initializes a Morse buffer and index for the Morse tree, which stores a sequence of dashes (1) and dots (0) related to the current character being received. This is passed to decodeMorse to find the given sequence’s associated character, which is then passed over to lcd_scroll_char.
+
+In the main code, to handle the states of the FSM, a high signal is classified into either a dot (0) or a dash (1). The element is then added to the Morse buffer. After this assignment, the buffer index is incremented by one to allocate space for the next element in the sequence to be decoded. Alternatively, the buffer index is set to 0 in the event of an overflow, but that shouldn’t occur for the receiver, as it should be able to hold all defined Morse code characters without overflow issues.
+
+The next points in the main code showcase the seamless merging between the Morse tree code and the modified LCD code, with the ADC handling of samples. This implementation does not need explicit handling of symbol spaces, as they are simply pauses within the decoding of the same character, therefore, nothing needs to be added. In the event of a word space, the receiver checks that the Morse buffer isn’t empty, at which point decodeMorse decodes the last character in the word, the buffer index is reset for the next character, and lcd_scroll_char is called to display a space on the LCD to start a new word.
+This analysis is applied to character spaces, the only difference being the omission of a space character to be displayed on the LCD. 
+
+Although this design easily fulfills the requirements for a reliable Morse code receiver, a switch was mapped to the modified lcd_clear function as a digital input available to the user for clearing the LCD. The modified lcd_clear uses a helper function, lcd_scroll_reset, which clears the scroll buffer and sets the scroll position to 0. This was added to fully comply with the functional and technical requirements.
+
+
+Multithreading
+
+The current system incorporates multithreading by the use of a timer structure to periodically sample the comparator input and save it to a queue [2]. The timer works by initiating an interrupt every 250 kHz to run the timer callback function, which is set to the sample function, which samples the comparator. This frequency was found to be the highest, which doesn't cause samples to be dropped, and leads to invalid outputs.
+
+When such a timer-based interrupt is called, the infinite loop in the main thread is stopped to execute the sample function, then execution continues as normal, with the main code handling the enqueued value (assuming there aren’t any other enqueued values) in the next iteration. This approach is the only one that allows for equally time-spaced samples and does not waste system resources by waiting.
+
+Planning and Management
+
+Based on Fig. 1, Morse code interpretation had the first robust implementation based on the Morse code binary tree, with Akram implementing it before conversion and pause handling was determined. Initially, the task distribution consisted of Daniel implementing the sampling functionality and devising a reliable digital conversion approach with Akram, while Antoni was responsible for LCD functionality. The first reliable conversion method that was conceived was using a Goertzel’s algorithm implementation for the analog-to-digital conversion, which would then be passed onto the Morse tree. Daniel proposed a competing circuit-oriented approach, which would rely on using a physical on-off keying decoder. Although Goertzel’s algorithm was implemented and showed merit as an efficient method of finding the target tone with a capability of handling significant noise, Daniel’s approach prevailed based on its simplicity and responsible use of the limited resources of the microcontroller. The current implementation was tested with successful transmission speeds of up to 270 WPM.
+
+Akram modified all code to remove reliance on any external libraries and merged the tree with the main code for handling dots, dashes, and pauses, with LCD function calls to display the output. Antoni and Daniel produced scrolling code to add scrolling functionality, with Antoni beginning initial LCD testing and Daniel responsible for sampling and eventually the analog to digital conversion favored over Goertzel’s algorithm. He and Akram merged this with the Morse tree and LCD functionality. Overall, the receiver easily meets all minimal requirements in addition to the functional and technical requirements. However, as a result of the robust conversion method and the rolling average threshold handling, the system has even more features, namely variable transmission speeds and noise handling. Antoni initially added scrolling functionality to lcd_print, but upon testing, this seemed costly since it operated on strings and had an inefficient algorithm. Hence, Daniel implemented an independent scrolling function, lcd_scroll_char, which is the final additional feature that was added.
+
+Testing
+Before testing real-time decoding with the microcontroller, the tree was tested via unit tests, which consisted of initializing the Morse tree and passing arrays for it to decode. Assertions checked if it was the correct output and verified that the tree and decodeMorse worked reliably. As for real-time decoding, the microcontroller was tested using a variety of signals, which included:
+“ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789 .,?/'=@()-+",”
+“PARIS” on loop,
+“TEST,”
+Random sporadic characters.
+
+In almost all cases, there was no error in the output even up to 270WPM. Below are some images of the outputs.
+
+
+In the above case, a few As were added to initialise the average.
+
+End of test string
+
+Versioning using git for testing was essential, as it allowed tuning the code without the fear of causing irreversible bugs. With a git checkout or git pull, the latest stable version of the code could have been accessed immediately. The code was also tested with compiler optimizations at level 3, which did not cause noticeable changes, as presumably most of the processing time was I/O. 
+
+The Keil MDK debugging tool was not useful here, as the signals used needed to be real-time, which debugging was not. The microcontroller was also left on for a whole night, and then given Morse code input at the same WPM as the previous day. The receiver had to adjust in a few characters as there were a few false inputs throughout the night, but then it successfully decoded the first test string. 
+
+When adding the clear screen functionality, the computation/waiting of i/o was noticeable. The check to see if the switch is high or low reduced the maximum WPM of the system from 300WPM to 270WPM. Using “PARIS” as a reference, Morse input with 50 dots, this translates to 225 dots per second, or 1 dot roughly every 4.4 microseconds. This exceedingly fast transmission rate indicated that our receiver design uses the memory and CPU of the LPC4088 resourcefully with fast interrupt responses and robust decoding logic. Given our design and the CPU’s clock speed of 120 MHz, the receiver excelled at standard rates such as 50 WPM, which do not push the microcontroller anywhere near its limits.
+
+
+
+Closure
+
+After extensive testing of the receiver, the system yielded exceptional results, easily fulfilling several additional requirements stated in the assignment specifications. The system could target a wide variety of frequencies, decoded reliably under extremely noisy conditions, and reached transmission speeds that made inputs unintelligible to the human ear. The current world record for Morse code transmission was set by Andrei Bindasov at 230 Morse code marks per minute (dashes or dots per minute) [3]. Our receiver was able to receive more words per minute than the world record holder sent in marks per minute, easily exceeding any conceivable human transmission rate. The microcontroller is likely to go much further in WPM if the I/O time were shorter. 
+
+Although the final system was desirable, the initial planning and development of the receiver deviated from our expected timeline, and the task distribution was handled more flexibly than anticipated, although the task independencies were still clearly outlined. Unfortunately, it took some time to adopt Keil MDK for remote testing and development. After Keil was set up successfully, development moved at a significantly smoother and more productive pace. Each component of our receiver was designed with modularity in mind. A minor limitation of our receiver was that it omitted the final character in the stream. However, this can be easily circumvented by sending another character.
+
+References
+
+[1] ITU, International Morse Code. ITU-R Recommendation M.1677-1, Oct. 2009. [Online]. Available: https://www.itu.int/rec/R-REC-M.1677-1-200910-I/
+[2] “Code,” University of Malta CCE2014 Course
+[3] Morse code world record
+
