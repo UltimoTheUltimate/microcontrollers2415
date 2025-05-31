@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2026/dev/Arch Linux) (preloaded format=xelatex 2025.3.31)  31 MAY 2025 14:45
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2026/dev/Arch Linux) (preloaded format=xelatex 2025.3.31)  31 MAY 2025 14:55
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -876,19 +876,22 @@ File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman (
 File: images/designdiag.png Graphic file (type bmp)
 <images/designdiag.png>
 
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
 
 File: images/circuit.png Graphic file (type bmp)
 <images/circuit.png>
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 43.
+(Font)              <10.95> on input line 46.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 43.
+(Font)              <8> on input line 46.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 43.
+(Font)              <6> on input line 46.
 
 
 LaTeX Font Info:    Font shape `TU/Lato(0)/m/sl' in size <10.95> not available
-(Font)              Font shape `TU/Lato(0)/m/it' tried instead on input line 50.
+(Font)              Font shape `TU/Lato(0)/m/it' tried instead on input line 51.
 
 Package scrlayer-scrpage Warning: \headheight to low.
 (scrlayer-scrpage)                At least 13.59999pt needed,
@@ -897,7 +900,7 @@ Package scrlayer-scrpage Warning: \headheight to low.
 (scrlayer-scrpage)                processing, but you should do this yourself,
 (scrlayer-scrpage)                e.g., setting geometry's option
 (scrlayer-scrpage)                `head=13.59999pt'.
-(scrlayer-scrpage)                I'll also decrease \topmargin on input line 50.
+(scrlayer-scrpage)                I'll also decrease \topmargin on input line 51.
 
 
 Overfull \vbox (13.59999pt too high) has occurred while \output is active []
@@ -911,7 +914,7 @@ Overfull \vbox (13.59999pt too high) has occurred while \output is active []
 File: images/fsm.png Graphic file (type bmp)
 <images/fsm.png>
 
-Underfull \hbox (badness 10000) in paragraph at lines 58--58
+Underfull \hbox (badness 10000) in paragraph at lines 61--61
 [][][]|\TU/Lato(0)/m/n/10.95 Finite State Machine (FSM) for Morse code
  []
 
@@ -924,79 +927,79 @@ Package microtype Info: Loading generic protrusion settings for font family
 
 
 
-Underfull \hbox (badness 1087) in paragraph at lines 79--80
+Underfull \hbox (badness 1087) in paragraph at lines 82--83
 \TU/Lato(0)/m/n/10.95 To merge the tree-based decoding and the 
  []
 
 
 
 [2]
-Underfull \vbox (badness 5189) has occurred while \output is active []
 
 
-
-
-Underfull \hbox (badness 1043) in paragraph at lines 99--100
+Underfull \hbox (badness 1043) in paragraph at lines 102--103
 \TU/Lato(0)/m/n/10.95 Before testing real-time decoding with the 
  []
 
 
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
 
 [3]
-Underfull \hbox (badness 2073) in paragraph at lines 101--105
+Underfull \hbox (badness 2073) in paragraph at lines 104--108
 []\TU/Lato(0)/m/n/10.95 “ABCDEFGHIJKLMNOPQRSTUVWXYZ 
  []
 
 File: images/testparis.png Graphic file (type bmp)
 <images/testparis.png>
 
-Underfull \hbox (badness 10000) in paragraph at lines 112--112
+Underfull \hbox (badness 10000) in paragraph at lines 115--115
 [][][]|\TU/Lato(0)/m/n/10.95 LCD output for test string “PARIS” at
  []
 
 File: images/testalfabet.png Graphic file (type bmp)
 <images/testalfabet.png>
 
-Underfull \hbox (badness 10000) in paragraph at lines 120--120
+Underfull \hbox (badness 10000) in paragraph at lines 123--123
 [][][]|\TU/Lato(0)/m/n/10.95 LCD output for test string
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 120--120
+Underfull \hbox (badness 10000) in paragraph at lines 123--123
 \TU/Lato(0)/m/n/10.95 “ABCDEFGHIJKLMNOPQRSTUVWXYZ”
  []
 
 
 
 
-Underfull \hbox (badness 1163) in paragraph at lines 135--136
+Underfull \hbox (badness 1163) in paragraph at lines 138--139
 \TU/Lato(0)/m/n/10.95 After extensive testing of the receiver, the 
  []
 
 
 
 [4]
-Underfull \hbox (badness 1521) in paragraph at lines 145--146
+Underfull \hbox (badness 1521) in paragraph at lines 148--149
 []\TU/Lato(0)/m/n/10.95 ITU, International Morse Code. ITU-R 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 151--152
+Underfull \hbox (badness 10000) in paragraph at lines 154--155
 []\TU/Lato(0)/m/n/10.95 Morse code world record. 
  []
 
 
-Underfull \hbox (badness 4673) in paragraph at lines 151--152
+Underfull \hbox (badness 4673) in paragraph at lines 154--155
 \TU/Lato(0)/m/n/10.95 [Online]. Available: [][]$[][][][][] [] [] [] [][][] [] 
  []
 
 
-Overfull \hbox (4.70616pt too wide) in paragraph at lines 151--152
+Overfull \hbox (4.70616pt too wide) in paragraph at lines 154--155
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]$[][]  
  []
 
 
-Underfull \hbox (badness 2689) in paragraph at lines 154--155
+Underfull \hbox (badness 2689) in paragraph at lines 157--158
 []\TU/Lato(0)/m/n/10.95 Embedded Artists, “LPC4088 OEM 
  []
 
@@ -1023,10 +1026,10 @@ Package rerunfilecheck Info: File `design_document.out' has not changed.
 Here is how much of TeX's memory you used:
  25346 strings out of 475848
  574081 string characters out of 5776013
- 1239113 words of memory out of 5000000
+ 1236113 words of memory out of 5000000
  47972 multiletter control sequences out of 15000+600000
  582596 words of font info for 96 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 122i,19n,121p,10974b,928s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 122i,19n,121p,10974b,927s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on design_document.xdv (5 pages, 162420 bytes).
+Output written on design_document.xdv (5 pages, 162328 bytes).
