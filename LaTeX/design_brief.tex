@@ -129,7 +129,7 @@ Versioning using git for testing was essential, as it allowed tuning the code wi
 
 The Keil MDK debugging tool was not useful here, as the signals used needed to be real-time, which debugging was not. The microcontroller was also left on for a whole night, and then given Morse code input at the same WPM as the previous day. The receiver had to adjust in a few characters as there were a few false inputs throughout the night, but then it successfully decoded the first test string.
 
-When adding the clear screen functionality, the computation/waiting of i/o was noticeable. The check to see if the switch is high or low reduced the maximum WPM of the system from 300WPM to 270WPM. Using “PARIS” as a reference, Morse input with 50 dots, this translates to 225 dots per second, or 1 dot roughly every 4.4 microseconds. This exceedingly fast transmission rate indicated that our receiver design uses the memory and CPU of the LPC4088 resourcefully with fast interrupt responses and robust decoding logic. Given our design and the CPU’s clock speed of 120 MHz, the receiver excelled at standard rates such as 50 WPM, which do not push the microcontroller anywhere near its limits.
+When adding the clear screen functionality, the computation/waiting of i/o was noticeable. The check to see if the switch is high or low reduced the maximum WPM of the system from 300WPM to 270WPM. Using “PARIS” as a reference, Morse input with 50 dots, this translates to 225 dots per second, or 1 dot roughly every 4.4 microseconds. This exceedingly fast transmission rate indicated that our receiver design uses the memory and CPU of the LPC4088 resourcefully with fast interrupt responses and robust decoding logic. Given our design and the CPU’s clock speed of 120 MHz \cite{lpc4088oem}, the receiver excelled at standard rates such as 50 WPM, which do not push the microcontroller anywhere near its limits.
 
 \section{Closure}
 After extensive testing of the receiver, the system yielded exceptional results, easily fulfilling several additional requirements stated in the assignment specifications. The system could target a wide variety of frequencies, decoded reliably under extremely noisy conditions, and reached transmission speeds that made inputs unintelligible to the human ear. The current world record for Morse code transmission was set by Andrei Bindasov at 230 Morse code marks per minute (dashes or dots per minute) [3]. Our receiver was able to receive more words per minute than the world record holder sent in marks per minute, easily exceeding any conceivable human transmission rate. The microcontroller is likely to go much further in WPM if the I/O time were shorter.
@@ -149,6 +149,9 @@ ITU, International Morse Code. ITU-R Recommendation M.1677-1, Oct. 2009. [Online
 
 \bibitem{morseworldrecord}
 Morse code world record. [Online]. Available: \url{https://www.guinnessworldrecords.com/world-records/fastest-speed-for-a-morse-code-transmission}
+
+\bibitem{lpc4088oem}
+Embedded Artists, “LPC4088 OEM Board.” [Online]. Available: \url{https://www.embeddedartists.com/products/lpc4088-oem/} [Accessed: May 31, 2025].
 
 \end{thebibliography}
 
