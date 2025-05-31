@@ -101,10 +101,12 @@ Akram modified all code to remove reliance on any external libraries and merged 
 \section{Testing}
 Before testing real-time decoding with the microcontroller, the tree was tested via unit tests, which consisted of initializing the Morse tree and passing arrays for it to decode. Assertions checked if it was the correct output and verified that the tree and decodeMorse worked reliably. As for real-time decoding, the microcontroller was tested using a variety of signals, which included:
 
-“ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789 .,?/'=@()-+,”
-“PARIS” on loop,
-“TEST,”
-Random sporadic characters.
+\begin{itemize}
+    \item \texttt{ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789 .,?/'=@()-+}
+    \item \texttt{PARIS} on loop
+    \item \texttt{TEST}
+    \item Random sporadic characters
+\end{itemize}
 
 In almost all cases, there was no error in the output even up to 270WPM. Below are some images of the outputs.
 
@@ -112,7 +114,7 @@ In almost all cases, there was no error in the output even up to 270WPM. Below a
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.4\textwidth]{images/testparis.png}
-    \caption{LCD output for test string ``PARIS'' at 50WPM.}
+    \caption{LCD output for test string ``PARIS'' at 50 WPM.}
     \label{testparis}
 \end{figure}
 
@@ -120,7 +122,7 @@ In almost all cases, there was no error in the output even up to 270WPM. Below a
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.4\textwidth]{images/testalfabet.png}
-    \caption{LCD output for test string ``ABCDEFGHIJKLMNOPQRSTUVWXYZ'' at 50WPM.}
+    \caption{LCD output for test string ``ABCDEFGHIJKLMNOPQRSTUVWXYZ'' at 50 WPM.}
     \label{testalfabet}
 \end{figure}
 
@@ -154,7 +156,7 @@ ITU, International Morse Code. ITU-R Recommendation M.1677-1, Oct. 2009. [Online
 Morse code world record. [Online]. Available: \url{https://www.guinnessworldrecords.com/world-records/fastest-speed-for-a-morse-code-transmission}
 
 \bibitem{lpc4088oem}
-Embedded Artists, “LPC4088 OEM Board.” [Online]. Available: \url{https://www.embeddedartists.com/products/lpc4088-oem/}
+Embedded Artists, “LPC4088 OEM Board.” [Online]. Available: \url{https://www.embeddedartists.com/products/lpc4088-oem/}.
 
 \end{thebibliography}
 
